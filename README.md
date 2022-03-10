@@ -8,4 +8,4 @@
 - Game Boy / Game Boy Color (GBC)
 - Game Boy Advance (GBA)
 - Nintendo DS (DS)
-- Sega Genesis / Mega Drive (GEN) **(in beta)**
+- Sega Genesis / Mega Drive (MD)
