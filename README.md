@@ -1,5 +1,5 @@
 # DeltArch
- Delta Emulator skins on RetroArch
+> Delta Emulator skins on RetroArch.
  
 ## Supported Systems
 - Nintendo Entertainment System (NES)
