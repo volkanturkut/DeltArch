@@ -22,4 +22,10 @@
 
 [Delta](https://github.com/rileytestut/Delta/) is an all-in-one classic video game emulator for non-jailbroken iOS devices.
 
+## Project Overview
 
+Delta skins on RetroArch.
+
+## Contact Me
+
+* Twitter: [@volkanturkut](https://twitter.com/volkanturkut)
