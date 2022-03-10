@@ -16,10 +16,10 @@
 
 # RetroArch
 
-RetroArch is the cross-platform, sophisticated reference frontend for the libretro API.
+[RetroArch](https://www.libretro.com/) is the cross-platform, sophisticated reference frontend for the libretro API.
 
 # Delta 
 
-Delta is an all-in-one classic video game emulator for non-jailbroken iOS devices.
+[Delta](https://github.com/rileytestut/Delta/) is an all-in-one classic video game emulator for non-jailbroken iOS devices.
 
 
