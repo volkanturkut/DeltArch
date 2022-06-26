@@ -2,7 +2,7 @@
 > Delta controller skins on RetroArch.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/705880/115471008-203aa480-a1ec-11eb-8aba-237a46799543.png" width=75%><br/>
+  <img src="https://user-images.githubusercontent.com/52756666/175827515-f49b74bf-5c59-4139-a75b-4ce89c2a58a0.png" width=75%><br/>
 </p>
  
 ## Supported Systems
