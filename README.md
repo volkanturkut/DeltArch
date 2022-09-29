@@ -12,7 +12,20 @@
 - Game Boy / Game Boy Color (GBC)
 - Game Boy Advance (GBA)
 - Nintendo DS (DS)
-- Sega Genesis / Mega Drive (MD)
+- Genesis / Mega Drive (MD)
+
+## To-Do Systems
+- DOS (DOS)
+- Nintendo 3DS (3DS)
+- Nintendo GameCube (GC)
+- Wii (Wii)
+- Virtual Boy (VB)
+- Dreamcast (DC)
+- PlayStation (PS)
+- PlayStation Portable (PSP)
+- PlayStation 2 (PS2)
+- Master System / Mark II (MKII)
+- Game Gear (GG)
 
 # RetroArch
 
