@@ -14,7 +14,7 @@
 - Nintendo DS (DS)
 - Genesis / Mega Drive (MD)
 
-## To-Do Systems
+## To-Do List
 - DOS (DOS)
 - Nintendo 3DS (3DS)
 - Nintendo GameCube (GC)
