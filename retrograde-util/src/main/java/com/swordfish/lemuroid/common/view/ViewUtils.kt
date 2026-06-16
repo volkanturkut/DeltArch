@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.swordfish.lemuroid.common.view
 
 import android.animation.ObjectAnimator
@@ -37,6 +39,7 @@ fun ProgressBar.animateProgress(
     }
 }
 
+@Suppress("ClickableViewAccessibility")
 fun View.disableTouchEvents() {
     this.setOnTouchListener { _, _ -> true }
 }

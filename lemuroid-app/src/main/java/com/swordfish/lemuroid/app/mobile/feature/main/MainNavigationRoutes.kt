@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.main
 
 import androidx.annotation.StringRes

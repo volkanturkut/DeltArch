@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.main
 
 import android.content.Context
@@ -17,6 +19,7 @@ class MainViewModel(appContext: Context, private val saveSyncManager: SaveSyncMa
         private val appContext: Context,
         private val saveSyncManager: SaveSyncManager,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return MainViewModel(appContext, saveSyncManager) as T
         }

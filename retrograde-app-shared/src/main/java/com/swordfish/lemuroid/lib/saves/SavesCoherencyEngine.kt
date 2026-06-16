@@ -4,7 +4,7 @@ import com.swordfish.lemuroid.lib.library.CoreID
 import com.swordfish.lemuroid.lib.library.db.entity.Game
 
 /*
-   Why does this class exist? Because shit happens and we want to make sure we are prepared.
+   Why does this class exist? Because shit happens. And we want to make sure we are prepared.
    This is the issue:
 
    User enables auto-save, plays, disables auto-save, plays for 10h, saves in game, re-enables

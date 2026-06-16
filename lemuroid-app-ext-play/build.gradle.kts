@@ -1,12 +1,13 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("kotlin-kapt")
+
 }
 
 android {
+
+
     kotlinOptions {
-        jvmTarget = "17"
     }
     namespace = "com.swordfish.lemuroid.ext"
 }
@@ -27,7 +28,7 @@ dependencies {
     implementation(deps.libs.play.playServices)
     implementation(deps.libs.play.coroutine)
     implementation(deps.libs.androidx.lifecycle.commonJava8)
-    kapt(deps.libs.androidx.lifecycle.processor)
+
 
     implementation(deps.libs.androidx.leanback.leanback)
     implementation(deps.libs.androidx.appcompat.constraintLayout)

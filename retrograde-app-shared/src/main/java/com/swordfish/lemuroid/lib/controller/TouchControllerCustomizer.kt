@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.swordfish.lemuroid.lib.controller
 
 class TouchControllerCustomizer {

@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.input
 
 import android.content.Context

@@ -116,7 +116,7 @@ enum class MetaSystemID(val titleResId: Int, val imageResId: Int, val systemIDs:
     ;
 
     fun color(): Int {
-        return ColorUtils.color(ordinal.toFloat() / values().size)
+        return ColorUtils.color(ordinal.toFloat() / entries.size)
     }
 
     companion object {

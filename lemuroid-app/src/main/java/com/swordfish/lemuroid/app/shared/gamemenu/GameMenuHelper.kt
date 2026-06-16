@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.gamemenu
 
 import android.app.Activity

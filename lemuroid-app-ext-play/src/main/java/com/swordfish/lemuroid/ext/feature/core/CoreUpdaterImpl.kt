@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.ext.feature.core
 
 import android.content.Context
@@ -158,7 +160,7 @@ class CoreUpdaterImpl(
     }
 
     companion object {
-        // Sadly dynamic features need to be tested directly on GooglePlay. Let's leave logging on.
+        // Sadly dynamic features need to be tested directly on Google Play. Let's leave logging on.
         private const val TAG_LOG = "CoreUpdaterImpl"
         private const val VERBOSE = true
         private const val RETRY_ATTEMPTS = 5

@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.lib.migration
 
 import com.swordfish.lemuroid.lib.library.CoreID
@@ -116,7 +118,7 @@ class DesmumeMigrationHandler(
         private const val SRM_EXTENSION = "srm"
         private const val DSV_EXTENSION = "dsv"
         private val DESMUME_FOOTER_PREFIX =
-            "|<--Snip above here to create a raw sav by excluding this DeSmuME savedata footer:"
+            "|<--Snip above here to create a raw sav by excluding this DeSmuME save data footer:"
                 .toByteArray(Charsets.US_ASCII)
     }
 }

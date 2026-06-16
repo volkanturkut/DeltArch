@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.tv.channel
 
 import android.content.Context
@@ -59,6 +61,7 @@ class ChannelUpdateWork(context: Context, workerParams: WorkerParameters) :
     @dagger.Subcomponent
     interface Subcomponent : AndroidInjector<ChannelUpdateWork> {
         @dagger.Subcomponent.Builder
+        @Suppress("DEPRECATION")
         abstract class Builder : AndroidInjector.Builder<ChannelUpdateWork>()
     }
 }

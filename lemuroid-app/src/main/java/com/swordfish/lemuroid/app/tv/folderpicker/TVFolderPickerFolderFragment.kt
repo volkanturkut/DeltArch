@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.tv.folderpicker
 
 import android.app.Activity
@@ -17,7 +19,7 @@ class TVFolderPickerFolderFragment : GuidedStepSupportFragment() {
         directory =
             File(
                 arguments?.getString(EXTRA_FOLDER)
-                    ?: throw IllegalArgumentException("EXTRA_FOLODER cannot be null"),
+                    ?: throw IllegalArgumentException("EXTRA_FOLDER cannot be null"),
             )
 
         super.onCreate(savedInstanceState)

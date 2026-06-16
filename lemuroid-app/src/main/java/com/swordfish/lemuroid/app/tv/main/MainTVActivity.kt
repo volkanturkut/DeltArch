@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.tv.main
 
 import android.Manifest
@@ -38,11 +40,23 @@ import kotlinx.coroutines.GlobalScope
 import javax.inject.Inject
 
 @OptIn(DelicateCoroutinesApi::class)
-class MainTVActivity : BaseTVActivity(), BusyActivity {
+class MainTVActivity : BaseTVActivity(), BusyActivity, com.swordfish.lemuroid.app.shared.game.GameLaunchDelegate {
     @Inject
     lateinit var gameLaunchTaskHandler: GameLaunchTaskHandler
 
     var mainViewModel: MainTVViewModel? = null
+
+    private val playGameLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            GlobalScope.safeLaunch {
+                gameLaunchTaskHandler.handleGameFinish(false, this@MainTVActivity, result.resultCode, result.data)
+                ChannelUpdateWork.enqueue(applicationContext)
+            }
+        }
+
+    override fun launchGameIntent(intent: Intent) {
+        playGameLauncher.launch(intent)
+    }
 
     override fun activity(): Activity = this
 
@@ -64,22 +78,7 @@ class MainTVActivity : BaseTVActivity(), BusyActivity {
         ensureLegacyStoragePermissionsIfNeeded()
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        when (requestCode) {
-            BaseGameActivity.REQUEST_PLAY_GAME -> {
-                GlobalScope.safeLaunch {
-                    gameLaunchTaskHandler.handleGameFinish(false, this@MainTVActivity, resultCode, data)
-                    ChannelUpdateWork.enqueue(applicationContext)
-                }
-            }
-        }
-    }
 
     private fun ensureLegacyStoragePermissionsIfNeeded() {
         if (TVHelper.isSAFSupported(this) || hasLegacyPermissions()) {

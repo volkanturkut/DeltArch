@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.touchinput.radial.layouts.shared
 
 import android.view.KeyEvent

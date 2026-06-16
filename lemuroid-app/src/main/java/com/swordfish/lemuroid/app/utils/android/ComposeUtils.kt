@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.utils.android
 
 import androidx.annotation.ArrayRes
@@ -21,6 +22,7 @@ fun stringListResource(
 }
 
 @Composable
+@Suppress("DEPRECATION")
 fun ComposableLifecycle(
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     onEvent: (LifecycleOwner, Lifecycle.Event) -> Unit,

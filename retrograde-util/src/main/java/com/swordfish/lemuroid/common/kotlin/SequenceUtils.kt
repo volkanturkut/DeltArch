@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.swordfish.lemuroid.common.kotlin
 
 fun <T> lazySequenceOf(vararg producers: () -> T): Sequence<T> {

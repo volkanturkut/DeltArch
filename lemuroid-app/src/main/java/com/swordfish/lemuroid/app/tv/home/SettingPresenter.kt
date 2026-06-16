@@ -7,15 +7,16 @@ import androidx.leanback.widget.Presenter
 
 class SettingPresenter(private val cardSize: Int, private val cardPadding: Int) : Presenter() {
     override fun onBindViewHolder(
-        viewHolder: Presenter.ViewHolder?,
-        item: Any,
+        viewHolder: Presenter.ViewHolder,
+        item: Any?,
     ) {
+        if (item == null) return
         val setting = item as TVSetting
         (viewHolder as ViewHolder).mCardView.titleText = viewHolder.view.context.resources.getString(setting.type.text)
         viewHolder.mCardView.setMainImageDimensions(cardSize, cardSize)
-        viewHolder.mCardView.mainImageView.setImageResource(setting.type.icon)
+        viewHolder.mCardView.mainImageView?.setImageResource(setting.type.icon)
 
-        viewHolder.mCardView.mainImageView.setPadding(cardPadding, cardPadding, cardPadding, cardPadding)
+        viewHolder.mCardView.mainImageView?.setPadding(cardPadding, cardPadding, cardPadding, cardPadding)
         viewHolder.mCardView.setMainImageScaleType(ImageView.ScaleType.FIT_CENTER)
 
         viewHolder.mCardView.isEnabled = setting.enabled
@@ -28,7 +29,7 @@ class SettingPresenter(private val cardSize: Int, private val cardPadding: Int) 
         return ViewHolder(cardView)
     }
 
-    override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder?) {}
+    override fun onUnbindViewHolder(viewHolder: Presenter.ViewHolder) {}
 
     class ViewHolder(view: ImageCardView) : Presenter.ViewHolder(view) {
         val mCardView: ImageCardView = view

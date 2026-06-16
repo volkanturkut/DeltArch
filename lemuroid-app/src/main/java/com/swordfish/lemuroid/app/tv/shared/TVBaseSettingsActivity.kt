@@ -9,6 +9,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import com.swordfish.lemuroid.app.shared.ImmersiveActivity
 
+@Suppress("DEPRECATION")
 abstract class TVBaseSettingsActivity : ImmersiveActivity() {
     abstract class BaseSettingsFragmentWrapper : LeanbackSettingsFragmentCompat() {
         override fun onPreferenceStartInitialScreen() {

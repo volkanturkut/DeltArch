@@ -9,6 +9,7 @@ import com.swordfish.lemuroid.lib.bios.Bios
 import com.swordfish.lemuroid.lib.bios.BiosManager
 
 class BiosPreferences(private val biosManager: BiosManager) {
+    @Suppress("DEPRECATION")
     fun addBiosPreferences(preferenceScreen: PreferenceScreen) {
         val context = preferenceScreen.context
         val (installedBios, notInstalledBios) = biosManager.getBiosInfo()

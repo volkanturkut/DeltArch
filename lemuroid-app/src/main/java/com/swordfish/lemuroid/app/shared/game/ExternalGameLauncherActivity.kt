@@ -1,6 +1,11 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.game
 
+import kotlin.time.Duration.Companion.milliseconds
+
 import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -19,6 +24,7 @@ import com.swordfish.lemuroid.common.coroutines.safeLaunch
 import com.swordfish.lemuroid.common.longAnimationDuration
 import com.swordfish.lemuroid.lib.core.CoresSelection
 import com.swordfish.lemuroid.lib.library.db.RetrogradeDatabase
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -35,8 +41,8 @@ import javax.inject.Inject
  * still runs in the main process so it can peek into background job status and wait for them to
  * complete.
  */
-@OptIn(FlowPreview::class)
-class ExternalGameLauncherActivity : ImmersiveActivity() {
+@OptIn(FlowPreview::class, DelicateCoroutinesApi::class)
+class ExternalGameLauncherActivity : ImmersiveActivity(), com.swordfish.lemuroid.app.shared.game.GameLaunchDelegate {
     @Inject
     lateinit var retrogradeDatabase: RetrogradeDatabase
 
@@ -48,6 +54,24 @@ class ExternalGameLauncherActivity : ImmersiveActivity() {
 
     @Inject
     lateinit var gameLauncher: GameLauncher
+
+    private val playGameLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val data = result.data
+            val isLeanback = data?.extras?.getBoolean(BaseGameActivity.PLAY_GAME_RESULT_LEANBACK) == true
+
+            GlobalScope.safeLaunch {
+                if (isLeanback) {
+                    ChannelUpdateWork.enqueue(applicationContext)
+                }
+                gameLaunchTaskHandler.handleGameFinish(false, this@ExternalGameLauncherActivity, result.resultCode, data)
+                finish()
+            }
+        }
+
+    override fun launchGameIntent(intent: Intent) {
+        playGameLauncher.launch(intent)
+    }
 
     private val loadingState = MutableStateFlow(true)
 
@@ -89,7 +113,7 @@ class ExternalGameLauncherActivity : ImmersiveActivity() {
             retrogradeDatabase.gameDao().selectById(gameId)
                 ?: throw IllegalArgumentException("Game not found: $gameId")
 
-        delay(animationDuration().toLong())
+        delay(animationDuration().milliseconds)
 
         val gameLaunchSuccessful =
             gameLauncher.launchGameAsync(
@@ -118,25 +142,5 @@ class ExternalGameLauncherActivity : ImmersiveActivity() {
         return PendingOperationsMonitor(applicationContext).anyOperationInProgress()
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        when (requestCode) {
-            BaseGameActivity.REQUEST_PLAY_GAME -> {
-                val isLeanback = data?.extras?.getBoolean(BaseGameActivity.PLAY_GAME_RESULT_LEANBACK) == true
-
-                GlobalScope.safeLaunch {
-                    if (isLeanback) {
-                        ChannelUpdateWork.enqueue(applicationContext)
-                    }
-                    gameLaunchTaskHandler.handleGameFinish(false, this@ExternalGameLauncherActivity, resultCode, data)
-                    finish()
-                }
-            }
-        }
-    }
 }

@@ -159,6 +159,7 @@ class TVHomeFragment : BrowseSupportFragment() {
         for (i: Int in 0 until adapter.size()) {
             val listRow = adapter.get(i) as ListRow
             if (listRow.headerItem.id == id) {
+                @Suppress("UNCHECKED_CAST")
                 return listRow.adapter as T
             }
         }

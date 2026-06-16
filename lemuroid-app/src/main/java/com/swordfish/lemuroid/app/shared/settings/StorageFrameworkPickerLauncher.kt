@@ -1,8 +1,11 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.settings
 
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import android.os.Bundle
 import com.swordfish.lemuroid.R
@@ -13,9 +16,33 @@ import com.swordfish.lemuroid.lib.preferences.SharedPreferencesHelper
 import com.swordfish.lemuroid.lib.storage.DirectoriesManager
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 class StorageFrameworkPickerLauncher : RetrogradeActivity() {
     @Inject
     lateinit var directoriesManager: DirectoriesManager
+
+    private val safLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val sharedPreferences = SharedPreferencesHelper.getLegacySharedPreferences(this)
+                val preferenceKey = getString(com.swordfish.lemuroid.lib.R.string.pref_key_extenral_folder)
+
+                val currentValue: String? = sharedPreferences.getString(preferenceKey, null)
+                val newValue = result.data?.data
+
+                if (newValue != null && newValue.toString() != currentValue) {
+                    updatePersistableUris(newValue)
+
+                    sharedPreferences.edit().apply {
+                        this.putString(preferenceKey, newValue.toString())
+                        this.apply()
+                    }
+                }
+
+                startLibraryIndexWork()
+            }
+            finish()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +56,7 @@ class StorageFrameworkPickerLauncher : RetrogradeActivity() {
                     this.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
                 }
             try {
-                startActivityForResult(intent, REQUEST_CODE_PICK_FOLDER)
+                safLauncher.launch(intent)
             } catch (e: Exception) {
                 showStorageAccessFrameworkNotSupportedDialog()
             }
@@ -42,33 +69,7 @@ class StorageFrameworkPickerLauncher : RetrogradeActivity() {
         displayErrorDialog(message, actionLabel) { finish() }
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        resultData: Intent?,
-    ) {
-        super.onActivityResult(requestCode, resultCode, resultData)
 
-        if (requestCode == REQUEST_CODE_PICK_FOLDER && resultCode == Activity.RESULT_OK) {
-            val sharedPreferences = SharedPreferencesHelper.getLegacySharedPreferences(this)
-            val preferenceKey = getString(com.swordfish.lemuroid.lib.R.string.pref_key_extenral_folder)
-
-            val currentValue: String? = sharedPreferences.getString(preferenceKey, null)
-            val newValue = resultData?.data
-
-            if (newValue != null && newValue.toString() != currentValue) {
-                updatePersistableUris(newValue)
-
-                sharedPreferences.edit().apply {
-                    this.putString(preferenceKey, newValue.toString())
-                    this.apply()
-                }
-            }
-
-            startLibraryIndexWork()
-        }
-        finish()
-    }
 
     private fun updatePersistableUris(uri: Uri) {
         contentResolver.persistedUriPermissions

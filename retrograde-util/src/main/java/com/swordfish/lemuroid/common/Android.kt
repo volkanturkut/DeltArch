@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.common
 
 import android.app.Activity
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 
+@Suppress("DEPRECATION")
 fun Bundle?.dump(): String {
     if (this == null) return "null"
 
@@ -36,10 +38,6 @@ fun Activity.displayToast(
 
 fun Context.animationDuration(): Int {
     return resources.getInteger(android.R.integer.config_mediumAnimTime)
-}
-
-fun Context.shortAnimationDuration(): Int {
-    return resources.getInteger(android.R.integer.config_shortAnimTime)
 }
 
 fun Context.longAnimationDuration(): Int {

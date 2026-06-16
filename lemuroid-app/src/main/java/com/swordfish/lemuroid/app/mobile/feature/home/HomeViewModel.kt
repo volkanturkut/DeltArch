@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.home
 
 import android.Manifest
@@ -46,6 +48,7 @@ class HomeViewModel(
         val retrogradeDb: RetrogradeDatabase,
         val coresSelection: CoresSelection,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return HomeViewModel(appContext, retrogradeDb, coresSelection) as T
         }

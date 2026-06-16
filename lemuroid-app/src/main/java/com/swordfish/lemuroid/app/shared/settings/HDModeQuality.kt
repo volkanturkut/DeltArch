@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.settings
 
 enum class HDModeQuality {
@@ -8,7 +10,7 @@ enum class HDModeQuality {
 
     companion object {
         fun parse(value: Int): HDModeQuality {
-            val result = kotlin.runCatching { HDModeQuality.values()[value] }
+            val result = kotlin.runCatching { HDModeQuality.entries[value] }
             return result.getOrNull() ?: MEDIUM
         }
     }

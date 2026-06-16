@@ -1,4 +1,7 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.utils.android.settings
+
+import kotlin.time.Duration.Companion.milliseconds
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -72,7 +75,7 @@ fun LemuroidSettingsList(
     val onSelected: (Int, Boolean) -> Unit = { selectedIndex, updateState ->
         coroutineScope.launch {
             if (updateState) state.value = selectedIndex
-            delay(closeDialogDelay)
+            delay(closeDialogDelay.milliseconds)
             showDialog = false
         }
     }

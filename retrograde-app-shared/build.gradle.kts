@@ -1,15 +1,18 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
     id("kotlinx-serialization")
 }
 
-android {
-    kotlinOptions {
-        jvmTarget = "17"
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-opt-in=kotlin.RequiresOptIn")
     }
 }
 
@@ -25,12 +28,10 @@ dependencies {
     implementation(deps.libs.androidx.leanback.leanbackPreference)
     implementation(deps.libs.androidx.ktx.collection)
     implementation(deps.libs.androidx.ktx.core)
-    implementation(deps.libs.androidx.ktx.coreKtx)
     implementation(deps.libs.androidx.fragment.fragment)
     implementation(deps.libs.androidx.fragment.ktx)
     implementation(deps.libs.androidx.activity.activity)
     implementation(deps.libs.androidx.activity.activityKtx)
-    implementation(deps.libs.androidx.ktx.coreKtx)
     implementation(deps.libs.androidx.paging.common)
     implementation(deps.libs.androidx.paging.runtime)
     implementation(deps.libs.androidx.room.common)
@@ -50,20 +51,9 @@ dependencies {
     implementation(deps.libs.kotlinxCoroutinesAndroid)
     implementation(deps.libs.flowPreferences)
 
-    kapt(deps.libs.androidx.room.compiler)
+    ksp(deps.libs.androidx.room.compiler)
 }
 
 android {
-    defaultConfig {
-        javaCompileOptions {
-            annotationProcessorOptions {
-                argument("room.schemaLocation", "$projectDir/schemas")
-            }
-        }
-    }
     namespace = "com.swordfish.lemuroid.lib"
-    kotlinOptions {
-        this as KotlinJvmOptions
-        jvmTarget = "17"
-    }
 }

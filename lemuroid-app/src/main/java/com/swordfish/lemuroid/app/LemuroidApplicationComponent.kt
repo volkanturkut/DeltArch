@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 /*
  * RetrogradeApplicationComponent.kt
  *
@@ -45,6 +47,7 @@ import dagger.android.support.AndroidSupportInjectionModule
     ],
 )
 @PerApp
+@Suppress("DEPRECATION")
 interface LemuroidApplicationComponent : AndroidInjector<LemuroidApplication> {
     @Component.Builder
     abstract class Builder : AndroidInjector.Builder<LemuroidApplication>()

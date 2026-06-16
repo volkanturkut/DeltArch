@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.settings.general
 
 import android.content.Context
@@ -27,6 +29,7 @@ class SettingsViewModel(
         private val saveSyncManager: SaveSyncManager,
         private val sharedPreferences: FlowSharedPreferences,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SettingsViewModel(
                 context,

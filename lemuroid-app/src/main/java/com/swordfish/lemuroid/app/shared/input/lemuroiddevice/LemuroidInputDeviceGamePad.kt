@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.input.lemuroiddevice
 
 import android.content.Context
@@ -49,7 +51,7 @@ class LemuroidInputDeviceGamePad(private val device: InputDevice) : LemuroidInpu
         return device.supportsAllKeys(MINIMAL_KEYS_DEFAULT_ENABLED)
     }
 
-    override fun getSupportedShortcuts(): List<GameShortcutType> = GameShortcutType.values().toList()
+    override fun getSupportedShortcuts(): List<GameShortcutType> = GameShortcutType.entries.toList()
 
     override fun isSupported(): Boolean {
         return sequenceOf(

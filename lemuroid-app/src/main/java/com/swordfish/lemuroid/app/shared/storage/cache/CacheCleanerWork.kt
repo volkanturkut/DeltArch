@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.storage.cache
 
 import android.content.Context
@@ -96,6 +98,7 @@ class CacheCleanerWork(
     @dagger.Subcomponent
     interface Subcomponent : AndroidInjector<CacheCleanerWork> {
         @dagger.Subcomponent.Builder
+        @Suppress("DEPRECATION")
         abstract class Builder : AndroidInjector.Builder<CacheCleanerWork>()
     }
 }

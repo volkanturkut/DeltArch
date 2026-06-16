@@ -1,4 +1,7 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.shared.main
+
+import kotlin.time.Duration.Companion.milliseconds
 
 import android.app.Activity
 import android.content.Context
@@ -13,6 +16,7 @@ import com.swordfish.lemuroid.lib.library.db.RetrogradeDatabase
 import com.swordfish.lemuroid.lib.library.db.entity.Game
 import kotlinx.coroutines.delay
 
+@Suppress("DEPRECATION")
 class GameLaunchTaskHandler(
     private val reviewManager: ReviewManager,
     private val retrogradeDb: RetrogradeDatabase,
@@ -85,7 +89,7 @@ class GameLaunchTaskHandler(
         activity: Activity,
         durationMillis: Long,
     ) {
-        delay(500)
+        delay(500.milliseconds)
         reviewManager.launchReviewFlow(activity, durationMillis)
     }
 

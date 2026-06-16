@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.lib.storage.local
 
 import android.content.Context

@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.tv.home
 
 import android.content.Context
@@ -31,6 +33,7 @@ class TVHomeViewModel(retrogradeDb: RetrogradeDatabase, appContext: Context) : V
         val retrogradeDb: RetrogradeDatabase,
         val appContext: Context,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return TVHomeViewModel(retrogradeDb, appContext) as T
         }
@@ -101,7 +104,7 @@ class TVHomeViewModel(retrogradeDb: RetrogradeDatabase, appContext: Context) : V
                 .filter { (_, count) -> count > 0 }
                 .map { (systemId, count) -> GameSystem.findById(systemId).metaSystemID() to count }
                 .groupBy { (metaSystemId, _) -> metaSystemId }
-                .map { (metaSystemId, counts) -> MetaSystemInfo(metaSystemId, counts.sumBy { it.second }) }
+                .map { (metaSystemId, counts) -> MetaSystemInfo(metaSystemId, counts.sumOf { it.second }) }
                 .sortedBy { it.getName(appContext) }
                 .toList()
         }

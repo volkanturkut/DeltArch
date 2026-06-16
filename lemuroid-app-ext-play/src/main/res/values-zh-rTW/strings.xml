@@ -25,7 +25,7 @@
     <string name="gdrive_connected_summary">已連結帳戶 %s</string>
     <string name="gdrive_connected_none_summary">未設定</string>
     <string name="gdrive_last_sync_completed">最後同步：%s</string>
-    <string name="game_loading_download_core">正在下載核心...</string>
+    <string name="game_loading_download_core">正在下載核心…</string>
     <string name="installing_core_notification_title">從 Play 更新核心</string>
     <string name="installing_core_notification_message">請打開 Google Play 商店 ，查看當前狀態</string>
     <string name="game_loader_error_load_core">Libretro 核心未加載。請嘗試以下方法：\n

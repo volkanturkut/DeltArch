@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.tv.folderpicker
 
 import android.os.Bundle

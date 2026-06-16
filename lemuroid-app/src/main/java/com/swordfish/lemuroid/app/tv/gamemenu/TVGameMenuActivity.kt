@@ -6,6 +6,7 @@ import com.swordfish.lemuroid.app.shared.GameMenuContract
 import com.swordfish.lemuroid.app.shared.coreoptions.LemuroidCoreOption
 import com.swordfish.lemuroid.app.shared.input.InputDeviceManager
 import com.swordfish.lemuroid.app.tv.shared.TVBaseSettingsActivity
+import com.swordfish.lemuroid.common.kotlin.overrideTransition
 import com.swordfish.lemuroid.lib.library.SystemCoreConfig
 import com.swordfish.lemuroid.lib.library.db.entity.Game
 import com.swordfish.lemuroid.lib.saves.StatesManager
@@ -13,6 +14,7 @@ import com.swordfish.lemuroid.lib.saves.StatesPreviewManager
 import java.security.InvalidParameterException
 import javax.inject.Inject
 
+@Suppress("DEPRECATION")
 class TVGameMenuActivity : TVBaseSettingsActivity() {
     @Inject
     lateinit var statesManager: StatesManager
@@ -36,12 +38,14 @@ class TVGameMenuActivity : TVBaseSettingsActivity() {
                 ) as SystemCoreConfig?
                     ?: throw InvalidParameterException("Missing EXTRA_SYSTEM_CORE_CONFIG")
 
+            @Suppress("UNCHECKED_CAST")
             val options =
                 intent.extras?.getSerializable(
                     GameMenuContract.EXTRA_CORE_OPTIONS,
                 ) as Array<LemuroidCoreOption>?
                     ?: throw InvalidParameterException("Missing EXTRA_CORE_OPTIONS")
 
+            @Suppress("UNCHECKED_CAST")
             val advancedOptions =
                 intent.extras?.getSerializable(
                     GameMenuContract.EXTRA_ADVANCED_CORE_OPTIONS,
@@ -90,7 +94,7 @@ class TVGameMenuActivity : TVBaseSettingsActivity() {
 
     override fun finish() {
         super.finish()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        overrideTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     class TVGameMenuFragmentWrapper(

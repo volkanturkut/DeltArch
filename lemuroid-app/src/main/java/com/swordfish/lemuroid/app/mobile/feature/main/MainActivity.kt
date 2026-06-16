@@ -1,7 +1,10 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.main
 
 import android.app.Activity
 import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.SystemBarStyle
@@ -77,7 +80,7 @@ import kotlinx.coroutines.GlobalScope
 import javax.inject.Inject
 
 @OptIn(DelicateCoroutinesApi::class)
-class MainActivity : RetrogradeComponentActivity(), BusyActivity {
+class MainActivity : RetrogradeComponentActivity(), BusyActivity, com.swordfish.lemuroid.app.shared.game.GameLaunchDelegate {
     @Inject
     lateinit var gameLaunchTaskHandler: GameLaunchTaskHandler
 
@@ -361,7 +364,7 @@ class MainActivity : RetrogradeComponentActivity(), BusyActivity {
                 val message =
                     remember {
                         val systemFolders =
-                            SystemID.values()
+                            SystemID.entries
                                 .joinToString(", ") { "<i>${it.dbname}</i>" }
 
                         getString(R.string.lemuroid_help_content)
@@ -377,30 +380,27 @@ class MainActivity : RetrogradeComponentActivity(), BusyActivity {
         }
     }
 
+    private val playGameLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            GlobalScope.safeLaunch {
+                gameLaunchTaskHandler.handleGameFinish(
+                    true,
+                    this@MainActivity,
+                    result.resultCode,
+                    result.data,
+                )
+            }
+        }
+
+    override fun launchGameIntent(intent: Intent) {
+        playGameLauncher.launch(intent)
+    }
+
     override fun activity(): Activity = this
 
     override fun isBusy(): Boolean = mainViewModel.state.value.operationInProgress ?: false
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        when (requestCode) {
-            BaseGameActivity.REQUEST_PLAY_GAME -> {
-                GlobalScope.safeLaunch {
-                    gameLaunchTaskHandler.handleGameFinish(
-                        true,
-                        this@MainActivity,
-                        resultCode,
-                        data,
-                    )
-                }
-            }
-        }
-    }
 
     @dagger.Module
     abstract class Module {

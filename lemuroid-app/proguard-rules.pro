@@ -6,7 +6,7 @@
 -verbose
 
 ## Arch Components
--keep class * implements android.arch.lifecycle.GeneratedAdapter {<init>(...);}
+-keep class * implements androidx.lifecycle.GeneratedAdapter {<init>(...);}
 
 ## Fabric
 -dontnote com.google.android.gms.**
@@ -17,7 +17,7 @@
 -dontnote kotlin.**
 -dontwarn org.jetbrains.annotations.**
 -keep class kotlin.Metadata { *; }
--keep class android.arch.lifecycle.**
+
 -dontwarn kotlinx.coroutines.flow.**
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 

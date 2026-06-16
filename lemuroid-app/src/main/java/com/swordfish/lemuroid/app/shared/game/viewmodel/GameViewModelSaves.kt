@@ -1,4 +1,8 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.game.viewmodel
+
+import kotlin.time.Duration.Companion.milliseconds
 
 import android.content.Context
 import com.swordfish.lemuroid.R
@@ -136,7 +140,7 @@ class GameViewModelSaves(
         var times = 10
 
         while (!loadSaveState(saveState) && times > 0) {
-            delay(200)
+            delay(200.milliseconds)
             times--
         }
     }

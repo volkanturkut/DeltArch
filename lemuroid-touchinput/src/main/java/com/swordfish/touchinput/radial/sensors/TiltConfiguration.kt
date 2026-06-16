@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.touchinput.radial.sensors
 
 import android.view.KeyEvent

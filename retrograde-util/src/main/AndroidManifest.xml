@@ -19,4 +19,4 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<manifest />
+<manifest xmlns:tools="http://schemas.android.com/tools" tools:ignore="all" />

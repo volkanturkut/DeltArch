@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.savesync
 
 import android.content.Context
@@ -148,6 +150,7 @@ class SaveSyncWork(context: Context, workerParams: WorkerParameters) :
     @dagger.Subcomponent
     interface Subcomponent : AndroidInjector<SaveSyncWork> {
         @dagger.Subcomponent.Builder
+        @Suppress("DEPRECATION")
         abstract class Builder : AndroidInjector.Builder<SaveSyncWork>()
     }
 }

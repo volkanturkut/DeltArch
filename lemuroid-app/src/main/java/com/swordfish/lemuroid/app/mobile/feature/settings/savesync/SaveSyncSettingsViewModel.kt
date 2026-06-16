@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.settings.savesync
 
 import android.app.Activity
@@ -21,6 +23,7 @@ class SaveSyncSettingsViewModel(
         private val application: Application,
         private val saveSyncManager: SaveSyncManager,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SaveSyncSettingsViewModel(application, saveSyncManager) as T
         }
@@ -61,12 +64,12 @@ class SaveSyncSettingsViewModel(
     }
 
     private fun computeCoreNames(): List<String> {
-        return CoreID.values().map { it.coreName }
+        return CoreID.entries.map { it.coreName }
     }
 
     private fun computeCoreVisibleNames(): List<String> {
         val context = getContext()
-        return CoreID.values().map { saveSyncManager.getDisplayNameForCore(context, it) }
+        return CoreID.entries.map { saveSyncManager.getDisplayNameForCore(context, it) }
     }
 
     private fun getContext(): Context {

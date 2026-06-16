@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="local_storage">Local Storage</string>
 
     <string name="controller_arcade_4">Default (4 buttons)</string>

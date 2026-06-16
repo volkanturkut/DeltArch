@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.tv.search
 
 import android.content.Context
@@ -62,6 +63,7 @@ class TVSearchFragment : SearchSupportFragment(), SearchSupportFragment.SearchRe
         launchOnState(Lifecycle.State.RESUMED) {
             searchViewModel.searchResults
                 .collect {
+                    @Suppress("UNCHECKED_CAST")
                     val gamesAdapter = (rowsAdapter.get(0) as ListRow).adapter as PagingDataAdapter<Game>
                     gamesAdapter.submitData(lifecycle, it)
                 }

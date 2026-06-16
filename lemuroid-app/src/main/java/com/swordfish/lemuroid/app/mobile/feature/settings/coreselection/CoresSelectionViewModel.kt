@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.settings.coreselection
 
 import android.content.Context
@@ -19,6 +21,7 @@ class CoresSelectionViewModel(
         val context: Context,
         val coresSelection: CoresSelection,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return CoresSelectionViewModel(context, coresSelection) as T
         }

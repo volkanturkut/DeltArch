@@ -1,3 +1,4 @@
+@file:Suppress("all")
 /*
  * LocalGameLibraryProvider.kt
  *

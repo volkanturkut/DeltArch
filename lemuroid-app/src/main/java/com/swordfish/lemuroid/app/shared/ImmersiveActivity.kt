@@ -3,6 +3,7 @@ package com.swordfish.lemuroid.app.shared
 import android.view.View
 import com.swordfish.lemuroid.lib.android.RetrogradeActivity
 
+@Suppress("DEPRECATION")
 abstract class ImmersiveActivity : RetrogradeActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)

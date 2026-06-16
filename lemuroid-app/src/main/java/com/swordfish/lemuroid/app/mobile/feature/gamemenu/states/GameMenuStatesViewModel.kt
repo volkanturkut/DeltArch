@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.gamemenu.states
 
 import android.app.Application
@@ -25,7 +27,8 @@ class GameMenuStatesViewModel(
         private val disableMissingEntries: Boolean,
         private val statesPreviewManager: StatesPreviewManager,
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GameMenuStatesViewModel(
                 application,
                 gameMenuRequest,

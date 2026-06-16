@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.touchinput.radial.ui
 
 import androidx.compose.foundation.layout.fillMaxSize

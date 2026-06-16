@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.library
 
 import android.content.Context
@@ -75,6 +77,7 @@ class CoreUpdateWork(context: Context, workerParams: WorkerParameters) :
     @dagger.Subcomponent
     interface Subcomponent : AndroidInjector<CoreUpdateWork> {
         @dagger.Subcomponent.Builder
+        @Suppress("DEPRECATION")
         abstract class Builder : AndroidInjector.Builder<CoreUpdateWork>()
     }
 }

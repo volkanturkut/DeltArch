@@ -3,6 +3,8 @@ package com.swordfish.lemuroid.common.preferences
 import android.content.SharedPreferences
 import androidx.preference.PreferenceDataStore
 
+import androidx.core.content.edit
+
 class SharedPreferencesDataStore(
     private val sharedPreferences: SharedPreferences,
 ) : PreferenceDataStore() {
@@ -10,42 +12,42 @@ class SharedPreferencesDataStore(
         key: String?,
         value: String?,
     ) {
-        sharedPreferences.edit().putString(key, value).apply()
+        sharedPreferences.edit { putString(key, value) }
     }
 
     override fun putStringSet(
         key: String?,
         values: MutableSet<String>?,
     ) {
-        sharedPreferences.edit().putStringSet(key, values).apply()
+        sharedPreferences.edit { putStringSet(key, values) }
     }
 
     override fun putInt(
         key: String?,
         value: Int,
     ) {
-        sharedPreferences.edit().putInt(key, value).apply()
+        sharedPreferences.edit { putInt(key, value) }
     }
 
     override fun putLong(
         key: String?,
         value: Long,
     ) {
-        sharedPreferences.edit().putLong(key, value).apply()
+        sharedPreferences.edit { putLong(key, value) }
     }
 
     override fun putFloat(
         key: String?,
         value: Float,
     ) {
-        sharedPreferences.edit().putFloat(key, value).apply()
+        sharedPreferences.edit { putFloat(key, value) }
     }
 
     override fun putBoolean(
         key: String?,
         value: Boolean,
     ) {
-        sharedPreferences.edit().putBoolean(key, value).apply()
+        sharedPreferences.edit { putBoolean(key, value) }
     }
 
     override fun getString(

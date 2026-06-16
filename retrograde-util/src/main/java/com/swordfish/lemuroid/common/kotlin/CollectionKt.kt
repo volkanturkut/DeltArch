@@ -34,10 +34,9 @@ inline fun <X, Y, Z, H> Map<X, Y>.zipOnKeys(
     f: (Y, Z) -> H,
 ): Map<X, H> {
     return this.keys.intersect(other.keys)
-        .map { key ->
-            key to f(this[key]!!, other[key]!!)
+        .associateWith { key ->
+            f(this[key]!!, other[key]!!)
         }
-        .toMap()
 }
 
 fun <E> Array<E>.toIndexedMap(): Map<Int, E> =

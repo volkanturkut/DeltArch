@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.touchinput.radial.controls
 
 import androidx.compose.foundation.layout.padding

@@ -1,9 +1,12 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.coreoptions
 
 import android.content.Context
 import com.swordfish.lemuroid.lib.library.ExposedSetting
 import java.io.Serializable
 
+@Suppress("DEPRECATION")
 data class LemuroidCoreOption(
     private val exposedSetting: ExposedSetting,
     private val coreOption: CoreOption,

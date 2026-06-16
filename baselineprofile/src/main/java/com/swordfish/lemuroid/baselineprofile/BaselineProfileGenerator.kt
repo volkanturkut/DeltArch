@@ -28,7 +28,7 @@ import org.junit.runner.RunWith
  *
  * When using this class to generate a baseline profile, only API 33+ or rooted API 28+ are supported.
  *
- * The minimum required version of androidx.benchmark to generate a baseline profile is 1.2.0.
+ * The minimum required version of androidx benchmark to generate a baseline profile is 1.2.0.
  **/
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -38,7 +38,7 @@ class BaselineProfileGenerator {
 
     @Test
     fun generate() {
-        // This example works only with the variant with application id `com.swordfish.lemuroid`."
+        // This example works only with the variant with application id `com.swordfish.lemuroid`.
         rule.collect(
             packageName = "com.swordfish.lemuroid",
             // See: https://d.android.com/topic/performance/baselineprofiles/dex-layout-optimizations

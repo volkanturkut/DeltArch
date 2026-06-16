@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.main
 
 import androidx.compose.animation.AnimatedVisibility
@@ -34,7 +36,7 @@ private fun LemuroidNavigationBar(
     navController: NavHostController,
 ) {
     NavigationBar(modifier = Modifier.fillMaxWidth()) {
-        MainNavigationRoutes.values().forEach { destination ->
+        MainNavigationRoutes.entries.forEach { destination ->
             val isSelected = currentRoute?.root == destination.route
             val iconDrawable = if (isSelected) destination.selectedIcon else destination.unselectedIcon
 

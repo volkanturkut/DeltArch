@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.settings.inputdevices
 
 import android.content.Context
@@ -26,6 +28,7 @@ class InputDevicesSettingsViewModel(
         val appContext: Context,
         val inputDeviceManager: InputDeviceManager,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return InputDevicesSettingsViewModel(appContext, inputDeviceManager) as T
         }

@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.utils.settings
 
 import android.content.SharedPreferences

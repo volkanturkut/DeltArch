@@ -1,4 +1,8 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.game.viewmodel
+
+import kotlin.time.Duration.Companion.milliseconds
 
 import android.view.KeyEvent
 import androidx.compose.foundation.layout.WindowInsets
@@ -147,7 +151,7 @@ class GameViewModelTouchControls(
             loadingMenuJob?.cancel()
             loadingMenuJob =
                 scope.launch {
-                    delay(MENU_LOADING_ANIMATION_MILLIS.toLong())
+                    delay(MENU_LOADING_ANIMATION_MILLIS.milliseconds)
                     sideEffects.showMenu(tilt, inputs)
                 }
         } else {

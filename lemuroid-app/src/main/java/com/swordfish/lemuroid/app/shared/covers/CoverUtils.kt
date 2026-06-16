@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.covers
 
 import android.content.Context
@@ -14,6 +16,7 @@ import com.swordfish.lemuroid.lib.library.db.entity.Game
 import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 
+@Suppress("DEPRECATION")
 object CoverUtils {
     fun loadCover(
         game: Game,

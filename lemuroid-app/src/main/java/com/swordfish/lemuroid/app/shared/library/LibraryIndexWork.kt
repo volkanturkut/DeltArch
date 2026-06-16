@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.library
 
 import android.content.Context
@@ -62,6 +64,7 @@ class LibraryIndexWork(context: Context, workerParams: WorkerParameters) :
     @dagger.Subcomponent
     interface Subcomponent : AndroidInjector<LibraryIndexWork> {
         @dagger.Subcomponent.Builder
+        @Suppress("DEPRECATION")
         abstract class Builder : AndroidInjector.Builder<LibraryIndexWork>()
     }
 }

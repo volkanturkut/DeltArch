@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.touchinput.radial.layouts
 
 import androidx.compose.foundation.layout.absolutePadding

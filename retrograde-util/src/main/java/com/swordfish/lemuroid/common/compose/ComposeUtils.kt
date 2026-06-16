@@ -13,6 +13,18 @@ fun Int.pxToDp(density: Density) = with(density) { this@pxToDp.toDp() }
 
 @Composable
 fun Dp.textUnit(): TextUnit {
-    val sizeInDp = this
-    return with(LocalDensity.current) { sizeInDp.toSp() }
+    return this.textUnit(LocalDensity.current)
+}
+
+fun Dp.textUnit(density: Density): TextUnit {
+    return with(density) { this@textUnit.toSp() }
+}
+
+@Composable
+fun TextUnit.dp(): Dp {
+    return this.dp(LocalDensity.current)
+}
+
+fun TextUnit.dp(density: Density): Dp {
+    return with(density) { this@dp.toDp() }
 }

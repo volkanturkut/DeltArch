@@ -1,8 +1,8 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Here we override the defualt Leanback colors to make them look Lemuroidish -->
-    <color name="lb_basic_card_bg_color">@color/leanback_foreground</color>
-    <color name="lb_basic_card_info_bg_color">@color/leanback_info</color>
+    <color name="lb_basic_card_bg_color" tools:override="true">@color/leanback_foreground</color>
+    <color name="lb_basic_card_info_bg_color" tools:override="true">@color/leanback_info</color>
 
     <style name="LemuroidLeanbackTheme" parent="Theme.Leanback">
         <item name="defaultBrandColor">@color/leanback_foreground</item>

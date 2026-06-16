@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.swordfish.lemuroid.common.preferences
 
 import androidx.preference.PreferenceDataStore

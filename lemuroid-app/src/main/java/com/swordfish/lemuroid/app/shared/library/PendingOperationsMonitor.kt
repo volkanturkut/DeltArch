@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.library
 
 import android.content.Context
@@ -19,7 +21,7 @@ class PendingOperationsMonitor(private val appContext: Context) {
     }
 
     fun anyOperationInProgress(): Flow<Boolean> {
-        return operationsInProgress(*Operation.values())
+        return operationsInProgress(*Operation.entries.toTypedArray())
     }
 
     fun anySaveOperationInProgress(): Flow<Boolean> {

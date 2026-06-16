@@ -44,7 +44,7 @@ class StartupBenchmarks {
     fun startupCompilationBaselineProfiles() = benchmark(CompilationMode.Partial(BaselineProfileMode.Require))
 
     private fun benchmark(compilationMode: CompilationMode) {
-        // This example works only with the variant with application id `com.swordfish.lemuroid`."
+        // This example works only with the variant with application id `com.swordfish.lemuroid`.
         rule.measureRepeated(
             packageName = "com.swordfish.lemuroid",
             metrics = listOf(StartupTimingMetric()),

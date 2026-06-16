@@ -4,11 +4,13 @@ import android.graphics.Bitmap
 import android.opengl.GLSurfaceView
 import android.view.PixelCopy
 import com.swordfish.lemuroid.common.kotlin.runCatchingWithRetry
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 import kotlin.math.roundToInt
 
 suspend fun GLSurfaceView.takeScreenshot(
@@ -22,10 +24,10 @@ suspend fun GLSurfaceView.takeScreenshot(
     }
 
 private suspend fun GLSurfaceView.takeScreenshot(maxResolution: Int): Bitmap? =
-    suspendCoroutine { cont ->
+    suspendCancellableCoroutine { cont ->
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.N) {
             cont.resume(null)
-            return@suspendCoroutine
+            return@suspendCancellableCoroutine
         }
 
         queueEvent {
@@ -34,7 +36,7 @@ private suspend fun GLSurfaceView.takeScreenshot(maxResolution: Int): Bitmap? =
                 val inputScaling = outputScaling * 2
 
                 val inputBitmap =
-                    Bitmap.createBitmap(
+                    createBitmap(
                         (width * inputScaling).roundToInt(),
                         (height * inputScaling).roundToInt(),
                         Bitmap.Config.ARGB_8888,
@@ -44,11 +46,9 @@ private suspend fun GLSurfaceView.takeScreenshot(maxResolution: Int): Bitmap? =
                     if (result == PixelCopy.SUCCESS) {
                         // This rescaling limits the artifacts introduced by shaders.
                         val outputBitmap =
-                            Bitmap.createScaledBitmap(
-                                inputBitmap,
+                            inputBitmap.scale(
                                 (width * outputScaling).roundToInt(),
                                 (height * outputScaling).roundToInt(),
-                                true,
                             )
 
                         cont.resume(outputBitmap)

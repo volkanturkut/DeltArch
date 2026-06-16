@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.search
 
 import androidx.compose.animation.AnimatedContent

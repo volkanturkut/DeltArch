@@ -1,13 +1,12 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("kotlin-kapt")
+
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
     kotlinOptions {
-        jvmTarget = "17"
     }
     namespace = "com.swordfish.lemuroid.common"
 
@@ -15,6 +14,7 @@ android {
         compose = true
     }
 
+    @Suppress("UnstableApiUsage")
     composeOptions {
         kotlinCompilerExtensionVersion = deps.versions.kotlinExtension
     }

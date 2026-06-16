@@ -1,4 +1,8 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.shared.game
+
+import kotlin.time.Duration.Companion.milliseconds
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -74,6 +78,7 @@ class BaseGameScreenViewModel(
         private val coreVariablesManager: CoreVariablesManager,
         private val rumbleManager: RumbleManager,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return BaseGameScreenViewModel(
                 appContext,
@@ -277,7 +282,7 @@ class BaseGameScreenViewModel(
     suspend fun reset() =
         withLoading {
             try {
-                delay(appContext.longAnimationDuration().toLong())
+                delay(appContext.longAnimationDuration().milliseconds)
                 retroGameView.retroGameViewFlow().reset()
             } catch (e: Throwable) {
                 Timber.e(e, "Error in reset")

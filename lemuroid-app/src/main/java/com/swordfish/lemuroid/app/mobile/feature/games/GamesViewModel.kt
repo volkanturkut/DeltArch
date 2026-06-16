@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.games
 
 import androidx.lifecycle.ViewModel
@@ -23,7 +25,8 @@ class GamesViewModel(
         private val retrogradeDb: RetrogradeDatabase,
         private val initialMetaSystem: MetaSystemID,
     ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GamesViewModel(retrogradeDb, initialMetaSystem) as T
         }
     }

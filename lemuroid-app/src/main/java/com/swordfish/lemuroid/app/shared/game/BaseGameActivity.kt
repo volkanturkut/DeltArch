@@ -1,5 +1,7 @@
 package com.swordfish.lemuroid.app.shared.game
 
+import kotlin.time.Duration.Companion.milliseconds
+
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
@@ -29,6 +31,7 @@ import com.swordfish.lemuroid.common.animationDuration
 import com.swordfish.lemuroid.common.coroutines.launchOnState
 import com.swordfish.lemuroid.common.displayToast
 import com.swordfish.lemuroid.common.dump
+import com.swordfish.lemuroid.common.kotlin.overrideTransition
 import com.swordfish.lemuroid.common.kotlin.serializable
 import com.swordfish.lemuroid.lib.core.CoreVariablesManager
 import com.swordfish.lemuroid.lib.game.GameLoader
@@ -93,8 +96,8 @@ abstract class BaseGameActivity : ImmersiveActivity() {
         super.onCreate(savedInstanceState)
         setUpExceptionsHandler()
         GameService.startService(applicationContext, intent)
-        game = intent.getSerializableExtra(EXTRA_GAME) as Game
-        systemCoreConfig = intent.getSerializableExtra(EXTRA_SYSTEM_CORE_CONFIG) as SystemCoreConfig
+        game = intent.serializable<Game>(EXTRA_GAME)!!
+        systemCoreConfig = intent.serializable<SystemCoreConfig>(EXTRA_SYSTEM_CORE_CONFIG)!!
         system = GameSystem.findById(game.systemId)
 
         val viewModel by viewModels<BaseGameScreenViewModel> {
@@ -219,7 +222,7 @@ abstract class BaseGameActivity : ImmersiveActivity() {
                 this.putExtra(GameMenuContract.EXTRA_TILT_ALL_CONFIGS, tiltConfigurations.toTypedArray())
             }
         startActivityForResult(intent, DIALOG_REQUEST)
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        overrideTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     protected abstract fun getDialogClass(): Class<out Activity>
@@ -300,7 +303,7 @@ abstract class BaseGameActivity : ImmersiveActivity() {
         val resultIntent =
             Intent().apply {
                 putExtra(PLAY_GAME_RESULT_SESSION_DURATION, System.currentTimeMillis() - startGameTime)
-                putExtra(PLAY_GAME_RESULT_GAME, intent.getSerializableExtra(EXTRA_GAME))
+                putExtra(PLAY_GAME_RESULT_GAME, intent.serializable<Game>(EXTRA_GAME))
                 putExtra(PLAY_GAME_RESULT_LEANBACK, intent.getBooleanExtra(EXTRA_LEANBACK, false))
             }
 
@@ -332,11 +335,11 @@ abstract class BaseGameActivity : ImmersiveActivity() {
     private fun finishAndExitProcess() {
         onFinishTriggered()
         GlobalScope.launch {
-            delay(animationDuration().toLong())
+            delay(animationDuration().milliseconds)
             GameService.requestTermination()
         }
         finish()
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        overrideTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
     open fun onFinishTriggered() {
@@ -455,7 +458,7 @@ abstract class BaseGameActivity : ImmersiveActivity() {
                 },
                 REQUEST_PLAY_GAME,
             )
-            activity.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            activity.overrideTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         }
     }
 }

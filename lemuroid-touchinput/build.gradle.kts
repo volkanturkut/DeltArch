@@ -1,21 +1,19 @@
 plugins {
     id("com.android.library")
     id("kotlin-android")
-    id("kotlin-kapt")
+
     id("kotlinx-serialization")
     id("kotlin-parcelize")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs +=
-            listOf(
-                "-Xcontext-receivers",
-            )
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     namespace = "com.swordfish.touchinput.controller"
+
 
     buildFeatures {
         compose = true
@@ -33,6 +31,7 @@ dependencies {
     implementation(deps.libs.androidx.compose.geometry)
     implementation(deps.libs.androidx.compose.runtime)
     implementation(deps.libs.androidx.compose.material3)
+    implementation(deps.libs.androidx.compose.extendedIcons)
 
     implementation(deps.libs.androidx.appcompat.constraintLayout)
     implementation(deps.libs.androidx.appcompat.appcompat)
@@ -48,5 +47,10 @@ dependencies {
 
     implementation(kotlin(deps.libs.kotlin.stdlib))
 
-    kapt(deps.libs.androidx.lifecycle.processor)
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xcontext-receivers")
+    }
 }

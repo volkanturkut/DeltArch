@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.tv
 
 import com.swordfish.lemuroid.app.tv.folderpicker.TVFolderPickerActivity

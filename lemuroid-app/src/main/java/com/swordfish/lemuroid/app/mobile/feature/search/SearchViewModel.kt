@@ -22,6 +22,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class SearchViewModel(private val retrogradeDb: RetrogradeDatabase) : ViewModel() {
     class Factory(val retrogradeDb: RetrogradeDatabase) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SearchViewModel(retrogradeDb) as T
         }
@@ -53,7 +54,7 @@ class SearchViewModel(private val retrogradeDb: RetrogradeDatabase) : ViewModel(
 
         return flow {
             emit(UIState.Loading)
-            delay(500)
+            delay(500.milliseconds)
             emit(UIState.Ready)
         }
     }

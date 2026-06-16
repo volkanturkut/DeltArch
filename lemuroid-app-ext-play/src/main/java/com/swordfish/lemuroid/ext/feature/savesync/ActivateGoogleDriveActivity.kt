@@ -1,9 +1,12 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.ext.feature.savesync
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -15,7 +18,34 @@ import com.google.api.services.drive.DriveScopes
 import com.swordfish.lemuroid.ext.R
 import timber.log.Timber
 
-class ActivateGoogleDriveActivity : Activity() {
+class ActivateGoogleDriveActivity : ComponentActivity() {
+
+    private val googleSignInLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val data = result.data
+            if (data != null) {
+                val completedTask = GoogleSignIn.getSignedInAccountFromIntent(data)
+                try {
+                    val account = completedTask.getResult(ApiException::class.java)
+                    val message = getString(R.string.gdrive_sign_in_success, account?.email)
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                    finish()
+                } catch (e: ApiException) {
+                    val message =
+                        getString(
+                            R.string.gdrive_sign_in_failed,
+                            e.message,
+                            e.statusCode.toString(),
+                        )
+                    Timber.e(e, message)
+                    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            } else {
+                finish()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -30,40 +60,13 @@ class ActivateGoogleDriveActivity : Activity() {
         }
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_GOOGLE_SIGN_IN) {
-            val completedTask = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                val account = completedTask.getResult(ApiException::class.java)
-                val message = getString(R.string.gdrive_sign_in_success, account?.email)
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-                finish()
-            } catch (e: ApiException) {
-                val message =
-                    getString(
-                        R.string.gdrive_sign_in_failed,
-                        e.message,
-                        e.statusCode.toString(),
-                    )
-                Timber.e(e, message)
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        }
-    }
-
     private fun authenticateGoogle() {
         val lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(this)
         val scope = Scope(DriveScopes.DRIVE_APPDATA)
 
         if (!GoogleSignIn.hasPermissions(lastSignedInAccount, scope)) {
             val signInClient = googleSignInClient()
-            startActivityForResult(signInClient.signInIntent, REQUEST_GOOGLE_SIGN_IN)
+            googleSignInLauncher.launch(signInClient.signInIntent)
         } else {
             disableGoogleDriveIntegration()
             finish()

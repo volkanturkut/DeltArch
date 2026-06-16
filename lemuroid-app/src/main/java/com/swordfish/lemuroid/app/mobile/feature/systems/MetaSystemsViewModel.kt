@@ -11,10 +11,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class MetaSystemsViewModel(retrogradeDb: RetrogradeDatabase, appContext: Context) : ViewModel() {
-    class Factory(
-        val retrogradeDb: RetrogradeDatabase,
-        val appContext: Context,
-    ) : ViewModelProvider.Factory {
+    class Factory(val retrogradeDb: RetrogradeDatabase, val appContext: Context) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return MetaSystemsViewModel(retrogradeDb, appContext) as T
         }
@@ -28,7 +26,7 @@ class MetaSystemsViewModel(retrogradeDb: RetrogradeDatabase, appContext: Context
                     .filter { (_, count) -> count > 0 }
                     .map { (systemId, count) -> GameSystem.findById(systemId).metaSystemID() to count }
                     .groupBy { (metaSystemId, _) -> metaSystemId }
-                    .map { (metaSystemId, counts) -> MetaSystemInfo(metaSystemId, counts.sumBy { it.second }) }
+                    .map { (metaSystemId, counts) -> MetaSystemInfo(metaSystemId, counts.sumOf { it.second }) }
                     .sortedBy { it.getName(appContext) }
                     .toList()
             }

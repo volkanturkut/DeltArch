@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.lib.saves
 
 import android.graphics.Bitmap

@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.settings.bios
 
 import androidx.lifecycle.ViewModel
@@ -13,7 +15,8 @@ class BiosSettingsViewModel(private val biosManager: BiosManager) : ViewModel() 
     class Factory
         @Inject
         constructor(private val biosManager: BiosManager) : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return BiosSettingsViewModel(biosManager) as T
             }
         }

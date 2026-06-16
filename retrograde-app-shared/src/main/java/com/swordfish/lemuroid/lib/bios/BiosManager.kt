@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.swordfish.lemuroid.lib.bios
 
 import com.swordfish.lemuroid.common.files.safeDelete

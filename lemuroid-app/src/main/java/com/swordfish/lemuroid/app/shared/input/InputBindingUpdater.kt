@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.shared.input
 
 import android.content.Context
@@ -12,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @OptIn(DelicateCoroutinesApi::class)
+@Suppress("DEPRECATION")
 class InputBindingUpdater(private val inputDeviceManager: InputDeviceManager, intent: Intent) {
     val extras = parseExtras(intent)
 

@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("kotlin-kapt")
+    id("com.google.devtools.ksp")
     id("androidx.navigation.safeargs.kotlin")
     id("kotlinx-serialization")
     id("androidx.baselineprofile")
@@ -61,20 +61,20 @@ android {
             dimension = "cores"
         }
 
-        // Download cores on demand (from GooglePlay or GitHub)
+        // Download cores on demand (from Google Play or GitHub)
         create("dynamic") {
             dimension = "cores"
         }
     }
 
-    packagingOptions {
+    packaging {
         jniLibs {
             // Stripping created some issues with some libretro cores such as ppsspp
             keepDebugSymbols += setOf("*/*/*_libretro_android.so")
             useLegacyPackaging = true
         }
         resources {
-            excludes += setOf("META-INF/DEPENDENCIES", "META-INF/library_release.kotlin_module")
+            excludes += setOf("META-INF/DEPENDENCIES", "META-INF/library_release.kotlin_module", "META-INF/INDEX.LIST")
         }
     }
 
@@ -94,8 +94,9 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
+            isShrinkResources = true
             signingConfig = signingConfigs["release"]
-            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             resValue("string", "lemuroid_name", "Lemuroid")
         }
         getByName("debug") {
@@ -106,7 +107,7 @@ android {
     }
 
     lint {
-        disable += setOf("MissingTranslation", "ExtraTranslation", "EnsureInitializerMetadata")
+        disable += setOf("ExtraTranslation", "EnsureInitializerMetadata")
     }
 
     buildFeatures {
@@ -114,12 +115,12 @@ android {
         buildConfig = true
     }
 
+    @Suppress("UnstableApiUsage")
     composeOptions {
         kotlinCompilerExtensionVersion = deps.versions.kotlinExtension
     }
 
     kotlinOptions {
-        jvmTarget = "17"
     }
     namespace = "com.swordfish.lemuroid"
 }
@@ -155,7 +156,6 @@ dependencies {
     implementation(deps.libs.androidx.lifecycle.commonJava8)
     implementation(deps.libs.androidx.lifecycle.reactiveStreams)
 
-    kapt(deps.libs.androidx.lifecycle.processor)
 
     implementation(deps.libs.androidx.leanback.leanback)
     implementation(deps.libs.androidx.leanback.leanbackPreference)
@@ -189,7 +189,7 @@ dependencies {
     debugImplementation(deps.libs.androidx.compose.tooling)
     implementation(deps.libs.androidx.compose.toolingPreview)
     implementation(deps.libs.androidx.compose.extendedIcons)
-    implementation(deps.libs.androidx.compose.accompanist.systemUiController)
+
     implementation(deps.libs.androidx.compose.accompanist.navigationMaterial)
     implementation(deps.libs.androidx.compose.accompanist.drawablePainter)
     implementation(deps.libs.androidx.paging.compose)
@@ -206,8 +206,8 @@ dependencies {
     // Uncomment this when using a local aar file.
     // implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-    kapt(deps.libs.dagger.android.processor)
-    kapt(deps.libs.dagger.compiler)
+    ksp(deps.libs.dagger.android.processor)
+    ksp(deps.libs.dagger.compiler)
 }
 
 fun usePlayDynamicFeatures(): Boolean {

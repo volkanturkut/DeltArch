@@ -9,6 +9,7 @@ import android.view.ViewConfiguration;
 *  The library seems to be deprecated and removed from all the major repositories.
 *  TODO... This should be removed when the touch controllers library will be migrated to compose.
 * */
+@SuppressWarnings("all")
 public class MultiTouchGestureDetector {
     public static final String TAG = "MultiTouchGestureDetector";
 

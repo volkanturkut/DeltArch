@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.map
 
 class TVGamesViewModel(retrogradeDb: RetrogradeDatabase) : ViewModel() {
     class Factory(val retrogradeDb: RetrogradeDatabase) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return TVGamesViewModel(retrogradeDb) as T
         }

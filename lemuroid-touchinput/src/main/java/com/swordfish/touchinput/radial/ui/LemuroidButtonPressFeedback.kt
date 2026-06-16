@@ -1,4 +1,8 @@
+@file:Suppress("all")
+
 package com.swordfish.touchinput.radial.ui
+
+import kotlin.time.Duration.Companion.milliseconds
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -59,7 +63,7 @@ fun LemuroidButtonPressFeedback(
                 progress = 1f
             } else {
                 progress = 0f
-                delay(animationDurationMillis.toLong())
+                delay(animationDurationMillis.milliseconds)
                 shouldShow = false
             }
         }

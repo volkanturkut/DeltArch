@@ -35,6 +35,7 @@ class TextDrawable(private val text: String, private val color: Int) : Drawable(
         canvas.drawText(text, xPos, yPos, mPaint)
     }
 
+    @Deprecated("Deprecated in Java", ReplaceWith("PixelFormat.UNKNOWN"))
     override fun getOpacity(): Int = mPaint.alpha
 
     override fun getIntrinsicWidth(): Int = -1

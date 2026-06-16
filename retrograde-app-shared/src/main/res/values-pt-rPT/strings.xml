@@ -78,13 +78,13 @@
     <string name="value_mgba_color_correction_gba">Activo</string>
     <string name="value_stella_filter_disabled">Desabilitado</string>
     <string name="value_stella_filter_composite">Compósito</string>
-    <string name="value_stella_filter_svideo">S-Video</string>
+    <string name="value_stella_filter_svideo">S-Vídeo</string>
     <string name="value_stella_filter_rgb">RGB</string>
     <string name="value_stella_filter_badlyadjusted">Mal ajustado</string>
     <string name="value_genesis_plus_gx_blargg_ntsc_filter_disabled">Desabilitado</string>
     <string name="value_genesis_plus_gx_blargg_ntsc_filter_monochrome">Monocromático</string>
     <string name="value_genesis_plus_gx_blargg_ntsc_filter_composite">Compósito</string>
-    <string name="value_genesis_plus_gx_blargg_ntsc_filter_svideo">S-Video</string>
+    <string name="value_genesis_plus_gx_blargg_ntsc_filter_svideo">S-Vídeo</string>
     <string name="value_genesis_plus_gx_blargg_ntsc_filter_rgb">RGB</string>
     <string name="value_genesis_plus_gx_overscan_disabled">Desabilitado</string>
     <string name="value_genesis_plus_gx_overscan_topbottom">Superior/Inferior</string>

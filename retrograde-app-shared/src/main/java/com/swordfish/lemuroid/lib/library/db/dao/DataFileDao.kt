@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.lib.library.db.dao
 
 import androidx.room.Dao

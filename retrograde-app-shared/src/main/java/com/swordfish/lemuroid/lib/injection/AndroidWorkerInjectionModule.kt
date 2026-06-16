@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.lib.injection
 
 import androidx.work.ListenableWorker

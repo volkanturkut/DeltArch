@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.settings.advanced
 
 import android.content.Context
@@ -20,6 +22,7 @@ class AdvancedSettingsViewModel(
         private val appContext: Context,
         private val settingsInteractor: SettingsInteractor,
     ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return AdvancedSettingsViewModel(appContext, settingsInteractor) as T
         }

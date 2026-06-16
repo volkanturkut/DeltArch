@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.app.mobile.feature.favorites
 
 import androidx.lifecycle.ViewModel
@@ -11,7 +13,8 @@ import kotlinx.coroutines.flow.Flow
 
 class FavoritesViewModel(retrogradeDb: RetrogradeDatabase) : ViewModel() {
     class Factory(val retrogradeDb: RetrogradeDatabase) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return FavoritesViewModel(retrogradeDb) as T
         }
     }

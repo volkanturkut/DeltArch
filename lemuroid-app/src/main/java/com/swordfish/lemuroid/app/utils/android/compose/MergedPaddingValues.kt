@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.utils.android.compose
 
 import androidx.compose.foundation.layout.PaddingValues

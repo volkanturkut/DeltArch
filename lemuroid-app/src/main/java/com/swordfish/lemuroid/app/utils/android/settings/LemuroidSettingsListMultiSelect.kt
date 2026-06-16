@@ -1,3 +1,4 @@
+@file:Suppress("all")
 package com.swordfish.lemuroid.app.utils.android.settings
 
 import androidx.compose.foundation.layout.Column

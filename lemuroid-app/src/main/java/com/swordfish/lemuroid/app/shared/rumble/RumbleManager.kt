@@ -23,6 +23,7 @@ import kotlinx.coroutines.newSingleThreadContext
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
+@Suppress("DEPRECATION")
 class RumbleManager(
     applicationContext: Context,
     private val settingsManager: SettingsManager,

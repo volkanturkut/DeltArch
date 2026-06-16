@@ -5,7 +5,6 @@ plugins {
 
 android {
     kotlinOptions {
-        jvmTarget = "17"
     }
     namespace = "com.swordfish.lemuroid.cores"
 }

@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.ext.feature.savesync
 
 import android.app.Activity

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ServiceInfo
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
+import com.swordfish.lemuroid.common.kotlin.parcelable
 import com.swordfish.lemuroid.app.mobile.shared.NotificationsManager
 import dagger.android.DaggerService
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +46,7 @@ class GameService : DaggerService() {
 
     private fun displayNotification(intent: Intent) {
         val gameIntent =
-            intent.getParcelableExtra<Intent>(EXTRA_GAME_ACTIVITY_INTENT)
+            intent.parcelable<Intent>(EXTRA_GAME_ACTIVITY_INTENT)
                 ?: return
         val notification = NotificationsManager(applicationContext).gameRunningNotification(gameIntent)
         ServiceCompat.startForeground(

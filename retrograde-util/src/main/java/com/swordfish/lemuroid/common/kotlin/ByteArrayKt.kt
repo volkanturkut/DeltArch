@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 /*
  * ByteArrayKt.kt
  *

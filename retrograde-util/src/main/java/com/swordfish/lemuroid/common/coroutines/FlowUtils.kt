@@ -23,8 +23,6 @@ suspend fun <T> Flow<T>.safeCollect(
         }
 }
 
-fun <T> Flow<T>.batchWithTime(maxMillis: Int) = batchWithSizeAndTime(Int.MAX_VALUE, maxMillis)
-
 fun <T> Flow<T>.batchWithSizeAndTime(
     maxSize: Int,
     maxMillis: Int,
@@ -45,6 +43,7 @@ fun <T> Flow<T>.batchWithSizeAndTime(
         if (batch.isNotEmpty()) emit(batch)
     }
 
+@Suppress("UNCHECKED_CAST")
 fun <T1, T2, T3, T4, T5, T6, R> combine(
     flow: Flow<T1>,
     flow2: Flow<T2>,
@@ -65,6 +64,7 @@ fun <T1, T2, T3, T4, T5, T6, R> combine(
         )
     }
 
+@Suppress("UNCHECKED_CAST")
 fun <T1, T2, T3, T4, T5, T6, T7, R> combine(
     flow: Flow<T1>,
     flow2: Flow<T2>,

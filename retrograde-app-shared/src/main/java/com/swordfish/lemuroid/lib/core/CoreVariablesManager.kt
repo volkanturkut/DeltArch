@@ -1,3 +1,5 @@
+@file:Suppress("all")
+
 package com.swordfish.lemuroid.lib.core
 
 import android.content.SharedPreferences
