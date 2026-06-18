@@ -63,9 +63,11 @@ class LocalStorageProvider(
     }
 
     private fun getExternalFolder(): File? {
-        val prefString = context.getString(R.string.pref_key_legacy_external_folder)
-        val preferenceManager = SharedPreferencesHelper.getLegacySharedPreferences(context)
-        return preferenceManager.getString(prefString, null)?.let { File(it) }
+        return SharedPreferencesHelper.allowDiskOperations {
+            val prefString = context.getString(R.string.pref_key_legacy_external_folder)
+            val preferenceManager = SharedPreferencesHelper.getLegacySharedPreferences(context)
+            preferenceManager.getString(prefString, null)?.let { File(it) }
+        }
     }
 
     private fun walkDirectory(rootDirectory: File): Flow<List<BaseStorageFile>> =

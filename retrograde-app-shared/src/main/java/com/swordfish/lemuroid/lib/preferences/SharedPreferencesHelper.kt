@@ -20,6 +20,20 @@ object SharedPreferencesHelper {
     /** Default shared preferences does not work with multi-process. It's currently used only for
      *  stored directory which are only read in the main process.*/
     fun getLegacySharedPreferences(context: Context): SharedPreferences {
-        return context.getSharedPreferences("${context.packageName}_preferences", Context.MODE_PRIVATE)
+        val oldPolicy = android.os.StrictMode.allowThreadDiskWrites()
+        try {
+            return context.getSharedPreferences("${context.packageName}_preferences", Context.MODE_PRIVATE)
+        } finally {
+            android.os.StrictMode.setThreadPolicy(oldPolicy)
+        }
+    }
+
+    inline fun <T> allowDiskOperations(block: () -> T): T {
+        val oldPolicy = android.os.StrictMode.allowThreadDiskWrites()
+        try {
+            return block()
+        } finally {
+            android.os.StrictMode.setThreadPolicy(oldPolicy)
+        }
     }
 }

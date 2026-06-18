@@ -218,8 +218,10 @@ abstract class BaseGameActivity : ImmersiveActivity() {
                     (baseGameScreenViewModel.retroGameView.retroGameView?.frameSpeed ?: 1) > 1,
                 )
                 this.putExtra(GameMenuContract.EXTRA_CURRENT_TILT_CONFIG, currentTiltConfiguration)
-                // TODO PADS... Make sure to avoid passing this if a physical pad is connected.
-                this.putExtra(GameMenuContract.EXTRA_TILT_ALL_CONFIGS, tiltConfigurations.toTypedArray())
+                val hasPhysicalGamePad = inputDeviceManager.getAllGamePads().isNotEmpty()
+                if (!hasPhysicalGamePad) {
+                    this.putExtra(GameMenuContract.EXTRA_TILT_ALL_CONFIGS, tiltConfigurations.toTypedArray())
+                }
             }
         startActivityForResult(intent, DIALOG_REQUEST)
         overrideTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -304,6 +306,7 @@ abstract class BaseGameActivity : ImmersiveActivity() {
             Intent().apply {
                 putExtra(PLAY_GAME_RESULT_SESSION_DURATION, System.currentTimeMillis() - startGameTime)
                 putExtra(PLAY_GAME_RESULT_GAME, intent.serializable<Game>(EXTRA_GAME))
+                putExtra(PLAY_GAME_RESULT_GAME_ID, game.id)
                 putExtra(PLAY_GAME_RESULT_LEANBACK, intent.getBooleanExtra(EXTRA_LEANBACK, false))
             }
 
@@ -430,6 +433,7 @@ abstract class BaseGameActivity : ImmersiveActivity() {
         const val REQUEST_PLAY_GAME = 1001
         const val PLAY_GAME_RESULT_SESSION_DURATION = "PLAY_GAME_RESULT_SESSION_DURATION"
         const val PLAY_GAME_RESULT_GAME = "PLAY_GAME_RESULT_GAME"
+        const val PLAY_GAME_RESULT_GAME_ID = "PLAY_GAME_RESULT_GAME_ID"
         const val PLAY_GAME_RESULT_LEANBACK = "PLAY_GAME_RESULT_LEANBACK"
         const val PLAY_GAME_RESULT_ERROR = "PLAY_GAME_RESULT_ERROR"
 

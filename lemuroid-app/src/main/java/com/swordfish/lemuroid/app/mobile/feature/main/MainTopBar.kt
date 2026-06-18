@@ -2,8 +2,8 @@ package com.swordfish.lemuroid.app.mobile.feature.main
 
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,12 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.CloudSync
-import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,7 +32,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -47,6 +49,7 @@ import androidx.navigation.NavHostController
 import com.swordfish.lemuroid.R
 import com.swordfish.lemuroid.app.shared.savesync.SaveSyncWork
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainTopBar(
     currentRoute: MainRoute,
@@ -54,6 +57,9 @@ fun MainTopBar(
     onHelpPressed: () -> Unit,
     onUpdateQueryString: (String) -> Unit,
     mainUIState: MainViewModel.UiState,
+    dynamicTitle: String? = null,
+    scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior? = null,
+    isSearchFocused: Boolean = false
 ) {
     Column {
         LemuroidTopAppBar(
@@ -62,6 +68,8 @@ fun MainTopBar(
             mainUIState = mainUIState,
             onHelpPressed = onHelpPressed,
             onUpdateQueryString = onUpdateQueryString,
+            dynamicTitle = dynamicTitle,
+            scrollBehavior = if (currentRoute == MainRoute.HOME && isSearchFocused) null else scrollBehavior
         )
 
         AnimatedVisibility(mainUIState.operationInProgress) {
@@ -78,19 +86,22 @@ fun LemuroidTopAppBar(
     mainUIState: MainViewModel.UiState,
     onHelpPressed: () -> Unit,
     onUpdateQueryString: (String) -> Unit,
+    dynamicTitle: String? = null,
+    scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior? = null
 ) {
     val context = LocalContext.current
-    val topBarColor = BottomAppBarDefaults.containerColor
+    val topBarColor = MaterialTheme.colorScheme.background
+
+    val titleText = if (route == MainRoute.HOME) {
+        dynamicTitle ?: "DeltArch"
+    } else {
+        stringResource(route.titleId)
+    }
 
     TopAppBar(
         title = {
-            if (route == MainRoute.SEARCH) {
-                LemuroidSearchView(
-                    mainUIState = mainUIState,
-                    onUpdateQueryString = onUpdateQueryString,
-                )
-            } else {
-                Text(text = stringResource(route.titleId))
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+                Text(text = titleText, style = MaterialTheme.typography.titleMedium)
             }
         },
         colors =
@@ -98,18 +109,21 @@ fun LemuroidTopAppBar(
                 scrolledContainerColor = topBarColor,
                 containerColor = topBarColor,
             ),
+        scrollBehavior = scrollBehavior,
         navigationIcon = {
-            AnimatedVisibility(
-                visible = route.parent != null,
-                enter = fadeIn(),
-                exit = fadeOut(),
+            // Left Action: Settings Gear
+            androidx.compose.material3.FilledTonalIconButton(
+                onClick = { navController.navigate(MainRoute.SETTINGS.route) },
+                modifier = Modifier.padding(start = 4.dp),
+                colors = androidx.compose.material3.IconButtonDefaults.filledTonalIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurface
+                )
             ) {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        stringResource(id = R.string.back),
-                    )
-                }
+                Icon(
+                    Icons.Outlined.Settings,
+                    stringResource(R.string.settings),
+                )
             }
         },
         actions = {
@@ -135,34 +149,21 @@ fun LemuroidTopBarActions(
     onHelpPressed: () -> Unit,
 ) {
     Row {
-        IconButton(
-            onClick = { onHelpPressed() },
+        // Right Action: Add (+) — opens file picker directly
+        androidx.compose.material3.FilledTonalIconButton(
+            onClick = {
+                com.swordfish.lemuroid.app.shared.settings.StorageFrameworkPickerLauncher.pickFolder(context)
+            },
+            modifier = Modifier.padding(end = 4.dp),
+            colors = androidx.compose.material3.IconButtonDefaults.filledTonalIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
         ) {
             Icon(
-                Icons.Outlined.Info,
-                stringResource(R.string.mobile_settings_help),
+                Icons.Default.Add,
+                contentDescription = "Import Games",
             )
-        }
-        if (saveSyncEnabled) {
-            IconButton(
-                onClick = { SaveSyncWork.enqueueManualWork(context.applicationContext) },
-                enabled = !operationsInProgress,
-            ) {
-                Icon(
-                    Icons.Outlined.CloudSync,
-                    stringResource(R.string.save_sync),
-                )
-            }
-        }
-        if (route.showBottomNavigation) {
-            IconButton(
-                onClick = { navController.navigate(MainRoute.SETTINGS.route) },
-            ) {
-                Icon(
-                    Icons.Outlined.Settings,
-                    stringResource(R.string.settings),
-                )
-            }
         }
     }
 }

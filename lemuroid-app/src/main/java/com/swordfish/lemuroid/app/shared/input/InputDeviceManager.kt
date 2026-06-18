@@ -231,7 +231,7 @@ class InputDeviceManager(
             .getDefaultBindings()
     }
 
-    private fun getAllGamePads(): List<InputDevice> {
+    fun getAllGamePads(): List<InputDevice> {
         return runCatching {
             InputDevice.getDeviceIds()
                 .map { InputDevice.getDevice(it) }

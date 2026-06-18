@@ -31,7 +31,7 @@ enum class MetaSystemID(val titleResId: Int, val imageResId: Int, val systemIDs:
     GBC(
         R.string.game_system_title_gbc,
         R.drawable.game_system_gbc,
-        listOf(SystemID.GBC),
+        listOf(SystemID.GB, SystemID.GBC),
     ),
     GBA(
         R.string.game_system_title_gba,
@@ -125,7 +125,7 @@ enum class MetaSystemID(val titleResId: Int, val imageResId: Int, val systemIDs:
                 SystemID.FBNEO -> ARCADE
                 SystemID.MAME2003PLUS -> ARCADE
                 SystemID.ATARI2600 -> ATARI2600
-                SystemID.GB -> GB
+                SystemID.GB -> GBC
                 SystemID.GBC -> GBC
                 SystemID.GBA -> GBA
                 SystemID.GENESIS -> GENESIS

@@ -8,7 +8,6 @@ import com.swordfish.lemuroid.lib.storage.DirectoriesManager
 import timber.log.Timber
 import java.io.File
 
-// TODO Get rid of this as soon as Desmume is gone
 class DesmumeMigrationHandler(
     private val directoriesManager: DirectoriesManager,
 ) {

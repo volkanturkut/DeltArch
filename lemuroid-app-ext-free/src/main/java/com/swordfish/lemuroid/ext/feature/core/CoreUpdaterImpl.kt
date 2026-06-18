@@ -92,6 +92,7 @@ class CoreUpdaterImpl(
         val destFile = File(coresDirectory, libFileName)
 
         if (destFile.exists()) {
+            destFile.setReadOnly()
             return destFile
         }
 
@@ -108,6 +109,7 @@ class CoreUpdaterImpl(
 
         try {
             downloadFile(uri, destFile)
+            destFile.setReadOnly()
             return destFile
         } catch (e: Throwable) {
             destFile.safeDelete()

@@ -10,6 +10,8 @@ import com.swordfish.lemuroid.common.paging.buildFlowPaging
 import com.swordfish.lemuroid.lib.library.db.RetrogradeDatabase
 import com.swordfish.lemuroid.lib.library.db.entity.Game
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class FavoritesViewModel(retrogradeDb: RetrogradeDatabase) : ViewModel() {
     class Factory(val retrogradeDb: RetrogradeDatabase) : ViewModelProvider.Factory {
@@ -19,6 +21,18 @@ class FavoritesViewModel(retrogradeDb: RetrogradeDatabase) : ViewModel() {
         }
     }
 
+    private val searchQuery = MutableStateFlow("")
+
+    fun setSearchQuery(query: String) {
+        searchQuery.value = query
+    }
+
+    @kotlinx.coroutines.ExperimentalCoroutinesApi
     val favorites: Flow<PagingData<Game>> =
-        buildFlowPaging(20, viewModelScope) { retrogradeDb.gameDao().selectFavorites() }
+        searchQuery.flatMapLatest { query ->
+            buildFlowPaging(60, viewModelScope) { 
+                if (query.isBlank()) retrogradeDb.gameDao().selectFavorites()
+                else retrogradeDb.gameDao().searchFavorites("%${query.trim()}%")
+            }
+        }
 }

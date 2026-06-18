@@ -42,6 +42,12 @@ interface GameDao {
     @Query("SELECT * FROM games WHERE isFavorite = 1 ORDER BY title ASC")
     fun selectFavorites(): PagingSource<Int, Game>
 
+    @Query("SELECT * FROM games WHERE isFavorite = 1 AND title LIKE :query ORDER BY title ASC")
+    fun searchFavorites(query: String): PagingSource<Int, Game>
+
+    @Query("SELECT count(*) FROM games WHERE isFavorite = 1")
+    fun selectFavoritesCountFlow(): Flow<Int>
+
     @Query(
         """
         SELECT * FROM games WHERE lastPlayedAt IS NOT NULL AND isFavorite = 0 ORDER BY lastPlayedAt DESC LIMIT :limit
@@ -55,6 +61,15 @@ interface GameDao {
     @Query("SELECT * FROM games WHERE lastPlayedAt IS NOT NULL ORDER BY lastPlayedAt DESC LIMIT :limit")
     suspend fun asyncSelectFirstRecents(limit: Int): List<Game>
 
+    @Query("SELECT count(*) FROM games WHERE lastPlayedAt IS NOT NULL")
+    fun selectRecentsCountFlow(): Flow<Int>
+
+    @Query("SELECT * FROM games WHERE lastPlayedAt IS NOT NULL ORDER BY lastPlayedAt DESC")
+    fun selectRecents(): PagingSource<Int, Game>
+
+    @Query("SELECT * FROM games WHERE lastPlayedAt IS NOT NULL AND title LIKE :query ORDER BY lastPlayedAt DESC")
+    fun searchRecents(query: String): PagingSource<Int, Game>
+
     @Query("SELECT * FROM games WHERE isFavorite = 1 ORDER BY lastPlayedAt DESC LIMIT :limit")
     fun selectFirstFavorites(limit: Int): Flow<List<Game>>
 
@@ -64,8 +79,14 @@ interface GameDao {
     @Query("SELECT * FROM games WHERE systemId = :systemId ORDER BY title ASC, id DESC")
     fun selectBySystem(systemId: String): PagingSource<Int, Game>
 
+    @Query("SELECT * FROM games WHERE systemId = :systemId AND title LIKE :query ORDER BY title ASC, id DESC")
+    fun searchBySystem(systemId: String, query: String): PagingSource<Int, Game>
+
     @Query("SELECT * FROM games WHERE systemId IN (:systemIds) ORDER BY title ASC, id DESC")
     fun selectBySystems(systemIds: List<String>): PagingSource<Int, Game>
+
+    @Query("SELECT * FROM games WHERE systemId IN (:systemIds) AND title LIKE :query ORDER BY title ASC, id DESC")
+    fun searchBySystems(systemIds: List<String>, query: String): PagingSource<Int, Game>
 
     @Query("SELECT DISTINCT systemId FROM games ORDER BY systemId ASC")
     suspend fun selectSystems(): List<String>

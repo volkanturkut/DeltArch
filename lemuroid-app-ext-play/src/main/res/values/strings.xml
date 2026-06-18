@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ strings.xml
   ~
@@ -19,7 +19,7 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="gdrive_sign_in_failed">Google Sign In failed: %s (%s)</string>
+    <string name="gdrive_sign_in_failed" formatted="false">Google Sign In failed: %s (%s)</string>
     <string name="gdrive_sign_in_success">Logged in to Google as %s</string>
     <string name="gdrive_sign_out_success">Logged out from Google</string>
     <string name="gdrive_missing_play_services">Google Drive requires Google Play Services which are not supported on your device</string>
@@ -27,7 +27,7 @@
     <string name="gdrive_connected_none_summary">Not configured</string>
     <string name="gdrive_last_sync_completed">Last sync: %s</string>
 
-    <string name="game_loading_download_core">Downloading Coreâ€¦</string>
+    <string name="game_loading_download_core">Downloading CoreÃ¢â‚¬Â¦</string>
 
     <string name="installing_core_notification_title">Updating Cores from Play</string>
     <string name="installing_core_notification_message">Check the Google Play Store app to see the current status</string>

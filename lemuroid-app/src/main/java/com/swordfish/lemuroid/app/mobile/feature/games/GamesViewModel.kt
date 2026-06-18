@@ -32,17 +32,27 @@ class GamesViewModel(
     }
 
     private val metaSystemId = MutableStateFlow(initialMetaSystem)
+    private val searchQuery = MutableStateFlow("")
+
+    fun setSearchQuery(query: String) {
+        searchQuery.value = query
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val games: Flow<PagingData<Game>> =
-        metaSystemId
-            .map { metaSystem -> metaSystem.systemIDs }
-            .map { systemIds -> systemIds.map { it.dbname } }
-            .flatMapLatest {
-                when (it.size) {
-                    0 -> emptyFlow()
-                    1 -> buildFlowPaging(20, viewModelScope) { retrogradeDb.gameDao().selectBySystem(it.first()) }
-                    else -> buildFlowPaging(20, viewModelScope) { retrogradeDb.gameDao().selectBySystems(it) }
+        kotlinx.coroutines.flow.combine(metaSystemId, searchQuery) { metaSystem, query ->
+            Pair(metaSystem.systemIDs.map { it.dbname }, query.trim())
+        }.flatMapLatest { (systemIds, query) ->
+            when (systemIds.size) {
+                0 -> emptyFlow()
+                1 -> buildFlowPaging(60, viewModelScope) { 
+                    if (query.isBlank()) retrogradeDb.gameDao().selectBySystem(systemIds.first())
+                    else retrogradeDb.gameDao().searchBySystem(systemIds.first(), "%$query%")
+                }
+                else -> buildFlowPaging(60, viewModelScope) { 
+                    if (query.isBlank()) retrogradeDb.gameDao().selectBySystems(systemIds)
+                    else retrogradeDb.gameDao().searchBySystems(systemIds, "%$query%")
                 }
             }
+        }
 }

@@ -34,7 +34,7 @@ class SearchViewModel(private val retrogradeDb: RetrogradeDatabase) : ViewModel(
 
     val searchResults =
         queryString
-            .debounce(400.milliseconds)
+            .debounce(300.milliseconds)
             .flatMapLatest {
                 buildFlowPaging(20, viewModelScope) {
                     retrogradeDb.gameSearchDao().search(it)
@@ -44,6 +44,7 @@ class SearchViewModel(private val retrogradeDb: RetrogradeDatabase) : ViewModel(
 
     val searchState: Flow<UIState> =
         queryString
+            .debounce(300.milliseconds)
             .flatMapLatest { searchStatesForQuery(it) }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), UIState.Idle)
 
@@ -54,7 +55,6 @@ class SearchViewModel(private val retrogradeDb: RetrogradeDatabase) : ViewModel(
 
         return flow {
             emit(UIState.Loading)
-            delay(500.milliseconds)
             emit(UIState.Ready)
         }
     }

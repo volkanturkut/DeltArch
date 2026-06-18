@@ -11,7 +11,6 @@ import com.swordfish.touchinput.radial.sensors.TILT_CONFIGURATION_L2_R2
 import com.swordfish.touchinput.radial.sensors.TILT_CONFIGURATION_L_R
 import com.swordfish.touchinput.radial.settings.TouchControllerID
 
-// TODO PADS... Make sure the ids are correct.
 object ControllerConfigs {
     val ATARI_2600 =
         ControllerConfig(

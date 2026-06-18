@@ -43,6 +43,7 @@
         android:theme="@style/LemuroidMaterialTheme">
         <activity
             android:name="com.swordfish.lemuroid.app.mobile.feature.main.MainActivity"
+            android:windowSoftInputMode="adjustResize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -65,6 +66,110 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.swordfish.lemuroid.app.mobile.feature.main.ImportGameActivity"
+            android:exported="true"
+            android:theme="@style/LemuroidMaterialTheme.Invisible">
+            <!-- Catch file:// URIs without host -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.nes" />
+                <data android:pathPattern=".*\\.NES" />
+                <data android:pathPattern=".*\\.sfc" />
+                <data android:pathPattern=".*\\.SFC" />
+                <data android:pathPattern=".*\\.smc" />
+                <data android:pathPattern=".*\\.SMC" />
+                <data android:pathPattern=".*\\.fig" />
+                <data android:pathPattern=".*\\.FIG" />
+                <data android:pathPattern=".*\\.n64" />
+                <data android:pathPattern=".*\\.N64" />
+                <data android:pathPattern=".*\\.z64" />
+                <data android:pathPattern=".*\\.Z64" />
+                <data android:pathPattern=".*\\.gb" />
+                <data android:pathPattern=".*\\.GB" />
+                <data android:pathPattern=".*\\.gbc" />
+                <data android:pathPattern=".*\\.GBC" />
+                <data android:pathPattern=".*\\.gba" />
+                <data android:pathPattern=".*\\.GBA" />
+                <data android:pathPattern=".*\\.ds" />
+                <data android:pathPattern=".*\\.DS" />
+                <data android:pathPattern=".*\\.nds" />
+                <data android:pathPattern=".*\\.NDS" />
+                <data android:pathPattern=".*\\.md" />
+                <data android:pathPattern=".*\\.MD" />
+                <data android:pathPattern=".*\\.gen" />
+                <data android:pathPattern=".*\\.GEN" />
+                <data android:pathPattern=".*\\.bin" />
+                <data android:pathPattern=".*\\.BIN" />
+                <data android:pathPattern=".*\\.smd" />
+                <data android:pathPattern=".*\\.SMD" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\.ZIP" />
+            </intent-filter>
+
+            <!-- Catch content:// URIs with host -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="content" />
+                <data android:host="*" />
+                <data android:mimeType="*/*" />
+                <data android:pathPattern=".*\\.nes" />
+                <data android:pathPattern=".*\\.NES" />
+                <data android:pathPattern=".*\\.sfc" />
+                <data android:pathPattern=".*\\.SFC" />
+                <data android:pathPattern=".*\\.smc" />
+                <data android:pathPattern=".*\\.SMC" />
+                <data android:pathPattern=".*\\.fig" />
+                <data android:pathPattern=".*\\.FIG" />
+                <data android:pathPattern=".*\\.n64" />
+                <data android:pathPattern=".*\\.N64" />
+                <data android:pathPattern=".*\\.z64" />
+                <data android:pathPattern=".*\\.Z64" />
+                <data android:pathPattern=".*\\.gb" />
+                <data android:pathPattern=".*\\.GB" />
+                <data android:pathPattern=".*\\.gbc" />
+                <data android:pathPattern=".*\\.GBC" />
+                <data android:pathPattern=".*\\.gba" />
+                <data android:pathPattern=".*\\.GBA" />
+                <data android:pathPattern=".*\\.ds" />
+                <data android:pathPattern=".*\\.DS" />
+                <data android:pathPattern=".*\\.nds" />
+                <data android:pathPattern=".*\\.NDS" />
+                <data android:pathPattern=".*\\.md" />
+                <data android:pathPattern=".*\\.MD" />
+                <data android:pathPattern=".*\\.gen" />
+                <data android:pathPattern=".*\\.GEN" />
+                <data android:pathPattern=".*\\.bin" />
+                <data android:pathPattern=".*\\.BIN" />
+                <data android:pathPattern=".*\\.smd" />
+                <data android:pathPattern=".*\\.SMD" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\.ZIP" />
+            </intent-filter>
+
+            <!-- Catch generic content:// URIs that don't pass extension in path -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:mimeType="*/*" />
+                <!-- Extra common ROM mimetypes -->
+                <data android:mimeType="application/x-nes-rom" />
+                <data android:mimeType="application/x-snes-rom" />
+                <data android:mimeType="application/x-n64-rom" />
+                <data android:mimeType="application/x-gameboy-rom" />
+                <data android:mimeType="application/x-gba-rom" />
+                <data android:mimeType="application/x-nintendo-ds-rom" />
+                <data android:mimeType="application/x-genesis-rom" />
+                <data android:mimeType="application/x-md-rom" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.swordfish.lemuroid.app.mobile.feature.game.GameActivity"
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"

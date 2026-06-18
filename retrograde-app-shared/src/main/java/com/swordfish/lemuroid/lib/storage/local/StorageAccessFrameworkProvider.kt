@@ -37,9 +37,35 @@ class StorageAccessFrameworkProvider(private val context: Context) : StorageProv
     override val enabledByDefault = true
 
     override fun listBaseStorageFiles(): Flow<List<BaseStorageFile>> {
-        return getExternalFolder()?.let { folder ->
+        val legacyFlow = getExternalFolder()?.let { folder ->
             traverseDirectoryEntries(Uri.parse(folder))
         } ?: emptyFlow()
+
+        val filesFlow = getExternalFiles()?.let { files ->
+            flow {
+                val baseStorageFiles = files.mapNotNull { uriString ->
+                    val uri = Uri.parse(uriString)
+                    val cursor = context.contentResolver.query(uri, null, null, null, null)
+                    cursor?.use {
+                        if (it.moveToFirst()) {
+                            val nameIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                            val sizeIndex = it.getColumnIndex(DocumentsContract.Document.COLUMN_SIZE)
+                            val name = if (nameIndex != -1) it.getString(nameIndex) else "Unknown"
+                            val size = if (sizeIndex != -1 && !it.isNull(sizeIndex)) it.getLong(sizeIndex) else 0L
+                            BaseStorageFile(
+                                name = name,
+                                size = size,
+                                uri = uri,
+                                path = uri.path ?: ""
+                            )
+                        } else null
+                    }
+                }
+                emit(baseStorageFiles)
+            }
+        } ?: emptyFlow()
+        
+        return kotlinx.coroutines.flow.merge(legacyFlow, filesFlow)
     }
 
     override fun getStorageFile(baseStorageFile: BaseStorageFile): StorageFile? {
@@ -47,9 +73,19 @@ class StorageAccessFrameworkProvider(private val context: Context) : StorageProv
     }
 
     private fun getExternalFolder(): String? {
-        val prefString = context.getString(R.string.pref_key_extenral_folder)
-        val preferenceManager = SharedPreferencesHelper.getLegacySharedPreferences(context)
-        return preferenceManager.getString(prefString, null)
+        return SharedPreferencesHelper.allowDiskOperations {
+            val prefString = context.getString(R.string.pref_key_extenral_folder)
+            val preferenceManager = SharedPreferencesHelper.getLegacySharedPreferences(context)
+            preferenceManager.getString(prefString, null)
+        }
+    }
+
+    private fun getExternalFiles(): Set<String>? {
+        return SharedPreferencesHelper.allowDiskOperations {
+            val prefString = context.getString(R.string.pref_key_external_files)
+            val preferenceManager = SharedPreferencesHelper.getLegacySharedPreferences(context)
+            preferenceManager.getStringSet(prefString, null)
+        }
     }
 
     private fun traverseDirectoryEntries(rootUri: Uri): Flow<List<BaseStorageFile>> =

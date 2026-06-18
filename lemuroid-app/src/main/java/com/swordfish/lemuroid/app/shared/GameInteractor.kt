@@ -33,6 +33,10 @@ class GameInteractor(
         if (!ensureNotificationsPermissionAvailable()) {
             return
         }
+        // Update lastPlayedAt immediately when the game is launched
+        GlobalScope.launch {
+            retrogradeDb.gameDao().update(game.copy(lastPlayedAt = System.currentTimeMillis()))
+        }
         gameLauncher.launchGameAsync(activity.activity(), game, true, useLeanback)
     }
 
@@ -42,6 +46,10 @@ class GameInteractor(
         }
         if (!ensureNotificationsPermissionAvailable()) {
             return
+        }
+        // Update lastPlayedAt immediately when the game is launched
+        GlobalScope.launch {
+            retrogradeDb.gameDao().update(game.copy(lastPlayedAt = System.currentTimeMillis()))
         }
         gameLauncher.launchGameAsync(activity.activity(), game, false, useLeanback)
     }

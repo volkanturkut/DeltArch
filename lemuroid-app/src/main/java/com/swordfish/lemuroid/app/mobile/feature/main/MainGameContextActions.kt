@@ -22,8 +22,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AppShortcut
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.material3.BottomSheetDefaults
@@ -125,7 +125,7 @@ private fun ContextActionContent(
         if (selectedGame.isFavorite) {
             ContextActionEntry(
                 label = stringResource(id = R.string.game_context_menu_remove_from_favorites),
-                icon = Icons.Default.FavoriteBorder,
+                icon = Icons.Default.StarBorder,
                 onClick = {
                     onFavoriteToggle(selectedGame, false)
                     selectedGameState.value = null
@@ -134,7 +134,7 @@ private fun ContextActionContent(
         } else {
             ContextActionEntry(
                 label = stringResource(id = R.string.game_context_menu_add_to_favorites),
-                icon = Icons.Default.Favorite,
+                icon = Icons.Default.Star,
                 onClick = {
                     onFavoriteToggle(selectedGame, true)
                     selectedGameState.value = null

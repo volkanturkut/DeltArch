@@ -7,7 +7,6 @@ import android.view.ViewConfiguration;
 /* This source file has been included directly from here:
 *  https://github.com/dinuscxj/MultiTouchGestureDetector/blob/master/multitouchgesturedetector/src/main/java/com/dinuscxj/gesture/MultiTouchGestureDetector.java
 *  The library seems to be deprecated and removed from all the major repositories.
-*  TODO... This should be removed when the touch controllers library will be migrated to compose.
 * */
 @SuppressWarnings("all")
 public class MultiTouchGestureDetector {

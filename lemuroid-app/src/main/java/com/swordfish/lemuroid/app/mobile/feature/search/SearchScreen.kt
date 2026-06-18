@@ -17,12 +17,22 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.swordfish.lemuroid.R
 import com.swordfish.lemuroid.app.mobile.shared.compose.ui.LemuroidEmptyView
 import com.swordfish.lemuroid.app.mobile.shared.compose.ui.LemuroidGameListRow
 import com.swordfish.lemuroid.lib.library.db.entity.Game
+
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 
 @Composable
 fun SearchScreen(
@@ -33,45 +43,52 @@ fun SearchScreen(
     onGameLongClick: (Game) -> Unit,
     onGameFavoriteToggle: (Game, Boolean) -> Unit,
     onResetSearchQuery: () -> Unit,
+    onUpdateQueryString: (String) -> Unit = {},
 ) {
     val searchState = viewModel.searchState.collectAsState(SearchViewModel.UIState.Idle)
     val searchGames = viewModel.searchResults.collectAsLazyPagingItems()
-
-    LaunchedEffect(Unit) {
-        onResetSearchQuery()
-    }
 
     LaunchedEffect(key1 = searchQuery) {
         viewModel.queryString.value = searchQuery
     }
 
-    AnimatedContent(
-        targetState = searchState.value,
-        label = "SearchContent",
-        transitionSpec = { fadeIn() togetherWith fadeOut() },
-    ) { state ->
-        when {
-            state == SearchViewModel.UIState.Idle -> {
-                SearchEmptyView(modifier, stringResource(R.string.game_page_search_suggestion))
-            }
+    Box(modifier = modifier.fillMaxSize()) {
+        val state = searchState.value
+        Box(modifier = Modifier.padding(bottom = 80.dp)) {
+            when {
+                state == SearchViewModel.UIState.Idle -> {
+                    SearchEmptyView(Modifier, stringResource(R.string.game_page_search_suggestion))
+                }
 
-            state == SearchViewModel.UIState.Loading -> {
-                SearchLoadingView(modifier)
-            }
+                state == SearchViewModel.UIState.Loading -> {
+                    SearchLoadingView(Modifier)
+                }
 
-            state == SearchViewModel.UIState.Ready && searchGames.itemCount == 0 -> {
-                SearchEmptyView(modifier, stringResource(id = R.string.empty_view_default))
-            }
+                state == SearchViewModel.UIState.Ready && searchGames.itemCount == 0 -> {
+                    SearchEmptyView(Modifier, stringResource(id = R.string.empty_view_default))
+                }
 
-            else -> {
-                SearchResultsView(
-                    modifier,
-                    searchGames,
-                    onGameClick,
-                    onGameLongClick,
-                    onGameFavoriteToggle,
-                )
+                else -> {
+                    SearchResultsView(
+                        Modifier,
+                        searchGames,
+                        onGameClick,
+                        onGameLongClick,
+                        onGameFavoriteToggle,
+                    )
+                }
             }
+        }
+        
+        Box(modifier = Modifier.align(Alignment.BottomCenter)) {
+            com.swordfish.lemuroid.app.mobile.shared.compose.ui.DeltArchBottomSearchBar(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .imePadding()
+                    .padding(vertical = 8.dp),
+                searchQuery = searchQuery,
+                onUpdateQueryString = onUpdateQueryString
+            )
         }
     }
 }

@@ -75,11 +75,16 @@ class GameLaunchTaskHandler(
         data: Intent?,
     ) {
         val duration =
-            data?.extras?.getLong(BaseGameActivity.PLAY_GAME_RESULT_SESSION_DURATION)
+            data?.getLongExtra(BaseGameActivity.PLAY_GAME_RESULT_SESSION_DURATION, 0L)
                 ?: 0L
-        val game = data?.extras?.getSerializable(BaseGameActivity.PLAY_GAME_RESULT_GAME) as Game
-
-        updateGamePlayedTimestamp(game)
+        val gameId = data?.getIntExtra(BaseGameActivity.PLAY_GAME_RESULT_GAME_ID, -1) ?: -1
+        
+        if (gameId != -1) {
+            val game = retrogradeDb.gameDao().selectById(gameId)
+            if (game != null) {
+                updateGamePlayedTimestamp(game)
+            }
+        }
         if (enableRatingFlow) {
             displayReviewRequest(activity, duration)
         }

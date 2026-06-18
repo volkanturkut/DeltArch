@@ -11,8 +11,10 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -24,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -118,6 +121,11 @@ class MainActivity : RetrogradeComponentActivity(), BusyActivity, com.swordfish.
         )
         super.onCreate(savedInstanceState)
 
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        val windowInsetsController = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        windowInsetsController.hide(androidx.core.view.WindowInsetsCompat.Type.navigationBars())
+
         GlobalScope.safeLaunch {
             reviewManager.initialize(applicationContext)
         }
@@ -174,7 +182,15 @@ class MainActivity : RetrogradeComponentActivity(), BusyActivity, com.swordfish.
                     .collectAsState(MainViewModel.UiState())
                     .value
 
+            val currentSystemTitle = remember { mutableStateOf<String?>(null) }
+            val isSearchFocused = remember { mutableStateOf(false) }
+
+            val scrollBehavior = androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior()
+
             Scaffold(
+                modifier = Modifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
                 topBar = {
                     MainTopBar(
                         currentRoute = currentRoute,
@@ -182,12 +198,14 @@ class MainActivity : RetrogradeComponentActivity(), BusyActivity, com.swordfish.
                         onHelpPressed = onHelpPressed,
                         mainUIState = mainUIState,
                         onUpdateQueryString = { mainViewModel.changeQueryString(it) },
+                        dynamicTitle = currentSystemTitle.value,
+                        scrollBehavior = scrollBehavior,
+                        isSearchFocused = isSearchFocused.value
                     )
                 },
-                bottomBar = { MainNavigationBar(currentRoute, navController) },
             ) { padding ->
-                NavHost(
-                    modifier = Modifier.fillMaxSize(),
+                androidx.navigation.compose.NavHost(
+                    modifier = Modifier.fillMaxSize().consumeWindowInsets(padding),
                     navController = navController,
                     startDestination = MainRoute.HOME.route,
                 ) {
@@ -203,9 +221,23 @@ class MainActivity : RetrogradeComponentActivity(), BusyActivity, com.swordfish.
                                             coresSelection,
                                         ),
                                 ),
+                            metaSystemsViewModel = 
+                                viewModel(
+                                    factory =
+                                        MetaSystemsViewModel.Factory(
+                                            retrogradeDb,
+                                            applicationContext,
+                                        ),
+                                ),
+                            retrogradeDb = retrogradeDb,
+                            searchQuery = mainUIState.searchQuery,
+                            onUpdateQueryString = { mainViewModel.changeQueryString(it) },
                             onGameClick = onGameClick,
                             onGameLongClick = onGameLongClick,
                             onOpenCoreSelection = { navController.navigateToRoute(MainRoute.SETTINGS_CORES_SELECTION) },
+                            onSystemTitleChanged = { currentSystemTitle.value = it },
+                            onSearchFocused = { isSearchFocused.value = true },
+                            onSearchUnfocused = { isSearchFocused.value = false },
                         )
                     }
                     composable(MainRoute.FAVORITES) {
@@ -231,6 +263,7 @@ class MainActivity : RetrogradeComponentActivity(), BusyActivity, com.swordfish.
                             onGameLongClick = onGameLongClick,
                             onGameFavoriteToggle = onGameFavoriteToggle,
                             onResetSearchQuery = { mainViewModel.changeQueryString("") },
+                            onUpdateQueryString = { mainViewModel.changeQueryString(it) }
                         )
                     }
                     composable(MainRoute.SYSTEMS) {
@@ -274,11 +307,13 @@ class MainActivity : RetrogradeComponentActivity(), BusyActivity, com.swordfish.
                                             applicationContext,
                                             settingsInteractor,
                                             saveSyncManager,
-                                            FlowSharedPreferences(
-                                                SharedPreferencesHelper.getLegacySharedPreferences(
-                                                    applicationContext,
-                                                ),
-                                            ),
+                                            SharedPreferencesHelper.allowDiskOperations {
+                                                FlowSharedPreferences(
+                                                    SharedPreferencesHelper.getLegacySharedPreferences(
+                                                        applicationContext,
+                                                    ),
+                                                )
+                                            },
                                         ),
                                 ),
                             navController = navController,

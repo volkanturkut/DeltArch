@@ -114,6 +114,14 @@ object DocumentFileParser {
         entry: ZipEntry,
         fileSize: Long,
     ): Boolean {
+        if (entry.isDirectory) return false
+        
+        val ext = entry.name.substringAfterLast('.', "")
+        val supportedExtensions = com.swordfish.lemuroid.lib.library.GameSystem.getSupportedExtensions()
+        if (supportedExtensions.contains(ext.lowercase(java.util.Locale.US))) {
+            return true
+        }
+        
         if (fileSize <= 0 || entry.compressedSize <= 0) return false
         return (entry.compressedSize.toFloat() / fileSize.toFloat()) > SINGLE_ARCHIVE_THRESHOLD
     }

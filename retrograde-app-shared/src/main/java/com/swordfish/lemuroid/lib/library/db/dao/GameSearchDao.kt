@@ -65,18 +65,19 @@ class GameSearchDao(private val internalDao: Internal) {
         }
     }
 
-    fun search(query: String): PagingSource<Int, Game> =
-        internalDao.rawSearch(
+    fun search(query: String): PagingSource<Int, Game> {
+        val likeQuery = if (query.isBlank()) query else "%$query%"
+        return internalDao.rawSearch(
             SimpleSQLiteQuery(
                 """
                 SELECT games.*
-                    FROM fts_games
-                    JOIN games ON games.id = fts_games.docid
-                    WHERE fts_games MATCH ?
+                    FROM games
+                    WHERE games.title LIKE ?
                 """,
-                arrayOf(query),
+                arrayOf(likeQuery),
             ),
         )
+    }
 
     @Dao
     interface Internal {

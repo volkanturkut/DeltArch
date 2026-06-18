@@ -3,7 +3,6 @@ package com.swordfish.lemuroid.app.utils.android
 import android.app.Activity
 import androidx.appcompat.app.AlertDialog
 
-// TODO COMPOSE... How do they look in the post compose world?
 fun Activity.displayErrorDialog(
     messageId: Int,
     actionLabelId: Int,

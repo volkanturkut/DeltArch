@@ -90,7 +90,6 @@ class CoresSelection(
         }.flowOn(Dispatchers.IO)
     }
 
-    // TODO Also get rid of this when desmume is gone
     private fun getDefaultCoreForSystem(system: GameSystem): String {
         if (system.id == SystemID.NDS) {
             return if (desmumeMigrationHandler.hasPendingDesmumeSaves()) {

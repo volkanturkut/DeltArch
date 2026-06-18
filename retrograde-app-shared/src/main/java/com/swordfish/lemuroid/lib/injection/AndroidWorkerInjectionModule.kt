@@ -7,8 +7,8 @@ import dagger.Module
 import dagger.android.AndroidInjector
 import dagger.multibindings.Multibinds
 
-private typealias Worker = Class<out ListenableWorker>
-private typealias WorkerFactory = AndroidInjector.Factory<out ListenableWorker>
+private typealias Worker = Class<*>
+private typealias WorkerFactory = AndroidInjector.Factory<*>
 
 @Module
 abstract class AndroidWorkerInjectionModule {
