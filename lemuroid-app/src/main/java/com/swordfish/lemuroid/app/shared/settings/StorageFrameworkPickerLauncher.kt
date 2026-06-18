@@ -123,7 +123,17 @@ class StorageFrameworkPickerLauncher : RetrogradeActivity() {
                                 fileName += ".rom"
                             }
 
-                            val destFile = java.io.File(romsDir, fileName)
+                            var destFile = java.io.File(romsDir, fileName)
+                            if (destFile.exists()) {
+                                val nameWithoutExtension = fileName!!.substringBeforeLast('.', fileName!!)
+                                val extension = if (fileName!!.contains('.')) "." + fileName!!.substringAfterLast('.') else ""
+                                var j = 1
+                                while (destFile.exists()) {
+                                    destFile = java.io.File(romsDir, "$nameWithoutExtension ($j)$extension")
+                                    j++
+                                }
+                            }
+                            
                             contentResolver.openInputStream(uri)?.use { input ->
                                 destFile.outputStream().use { output ->
                                     input.copyTo(output)

@@ -55,7 +55,7 @@ class LibretroDBMetadataProvider(private val ovgdbManager: LibretroDBManager) :
         return GameMetadata(
             name = rom.name,
             romName = rom.romName,
-            thumbnail = computeCoverUrl(system, rom.name),
+            thumbnail = computeCoverUrl(system, rom.system, rom.name),
             system = rom.system,
             developer = rom.developer,
         )
@@ -163,9 +163,14 @@ class LibretroDBMetadataProvider(private val ovgdbManager: LibretroDBManager) :
 
     private fun computeCoverUrl(
         system: GameSystem,
+        systemDbName: String?,
         name: String?,
     ): String? {
         var systemName = system.libretroFullName
+
+        if (systemDbName == SystemID.GB.dbname) {
+            systemName = "Nintendo - Game Boy"
+        }
 
         // Specific mame version don't have any thumbnails in Libretro database
         if (system.id == SystemID.MAME2003PLUS) {

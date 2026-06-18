@@ -39,59 +39,59 @@ interface GameDao {
     @Query("SELECT * FROM games WHERE lastIndexedAt < :lastIndexedAt")
     fun selectByLastIndexedAtLessThan(lastIndexedAt: Long): List<Game>
 
-    @Query("SELECT * FROM games WHERE isFavorite = 1 ORDER BY title ASC")
+    @Query("SELECT * FROM games WHERE isFavorite = 1 GROUP BY title, systemId, coverFrontUrl ORDER BY title ASC")
     fun selectFavorites(): PagingSource<Int, Game>
 
-    @Query("SELECT * FROM games WHERE isFavorite = 1 AND title LIKE :query ORDER BY title ASC")
+    @Query("SELECT * FROM games WHERE isFavorite = 1 AND title LIKE :query GROUP BY title, systemId, coverFrontUrl ORDER BY title ASC")
     fun searchFavorites(query: String): PagingSource<Int, Game>
 
-    @Query("SELECT count(*) FROM games WHERE isFavorite = 1")
+    @Query("SELECT count(DISTINCT title) FROM games WHERE isFavorite = 1")
     fun selectFavoritesCountFlow(): Flow<Int>
 
     @Query(
         """
-        SELECT * FROM games WHERE lastPlayedAt IS NOT NULL AND isFavorite = 0 ORDER BY lastPlayedAt DESC LIMIT :limit
+        SELECT * FROM games WHERE lastPlayedAt IS NOT NULL AND isFavorite = 0 GROUP BY title, systemId, coverFrontUrl ORDER BY lastPlayedAt DESC LIMIT :limit
         """,
     )
     fun selectFirstUnfavoriteRecents(limit: Int): Flow<List<Game>>
 
-    @Query("SELECT * FROM games WHERE isFavorite = 1 ORDER BY lastPlayedAt DESC LIMIT :limit")
+    @Query("SELECT * FROM games WHERE isFavorite = 1 GROUP BY title, systemId, coverFrontUrl ORDER BY lastPlayedAt DESC LIMIT :limit")
     fun selectFirstFavoritesRecents(limit: Int): Flow<List<Game>>
 
-    @Query("SELECT * FROM games WHERE lastPlayedAt IS NOT NULL ORDER BY lastPlayedAt DESC LIMIT :limit")
+    @Query("SELECT * FROM games WHERE lastPlayedAt IS NOT NULL GROUP BY title, systemId, coverFrontUrl ORDER BY lastPlayedAt DESC LIMIT :limit")
     suspend fun asyncSelectFirstRecents(limit: Int): List<Game>
 
-    @Query("SELECT count(*) FROM games WHERE lastPlayedAt IS NOT NULL")
+    @Query("SELECT count(DISTINCT title) FROM games WHERE lastPlayedAt IS NOT NULL")
     fun selectRecentsCountFlow(): Flow<Int>
 
-    @Query("SELECT * FROM games WHERE lastPlayedAt IS NOT NULL ORDER BY lastPlayedAt DESC")
+    @Query("SELECT * FROM games WHERE lastPlayedAt IS NOT NULL GROUP BY title, systemId, coverFrontUrl ORDER BY lastPlayedAt DESC")
     fun selectRecents(): PagingSource<Int, Game>
 
-    @Query("SELECT * FROM games WHERE lastPlayedAt IS NOT NULL AND title LIKE :query ORDER BY lastPlayedAt DESC")
+    @Query("SELECT * FROM games WHERE lastPlayedAt IS NOT NULL AND title LIKE :query GROUP BY title, systemId, coverFrontUrl ORDER BY lastPlayedAt DESC")
     fun searchRecents(query: String): PagingSource<Int, Game>
 
-    @Query("SELECT * FROM games WHERE isFavorite = 1 ORDER BY lastPlayedAt DESC LIMIT :limit")
+    @Query("SELECT * FROM games WHERE isFavorite = 1 GROUP BY title, systemId, coverFrontUrl ORDER BY lastPlayedAt DESC LIMIT :limit")
     fun selectFirstFavorites(limit: Int): Flow<List<Game>>
 
-    @Query("SELECT * FROM games WHERE lastPlayedAt IS NULL LIMIT :limit")
+    @Query("SELECT * FROM games WHERE lastPlayedAt IS NULL GROUP BY title, systemId, coverFrontUrl LIMIT :limit")
     fun selectFirstNotPlayed(limit: Int): Flow<List<Game>>
 
-    @Query("SELECT * FROM games WHERE systemId = :systemId ORDER BY title ASC, id DESC")
+    @Query("SELECT * FROM games WHERE systemId = :systemId GROUP BY title, systemId, coverFrontUrl ORDER BY title ASC, id DESC")
     fun selectBySystem(systemId: String): PagingSource<Int, Game>
 
-    @Query("SELECT * FROM games WHERE systemId = :systemId AND title LIKE :query ORDER BY title ASC, id DESC")
+    @Query("SELECT * FROM games WHERE systemId = :systemId AND title LIKE :query GROUP BY title, systemId, coverFrontUrl ORDER BY title ASC, id DESC")
     fun searchBySystem(systemId: String, query: String): PagingSource<Int, Game>
 
-    @Query("SELECT * FROM games WHERE systemId IN (:systemIds) ORDER BY title ASC, id DESC")
+    @Query("SELECT * FROM games WHERE systemId IN (:systemIds) GROUP BY title, systemId, coverFrontUrl ORDER BY title ASC, id DESC")
     fun selectBySystems(systemIds: List<String>): PagingSource<Int, Game>
 
-    @Query("SELECT * FROM games WHERE systemId IN (:systemIds) AND title LIKE :query ORDER BY title ASC, id DESC")
+    @Query("SELECT * FROM games WHERE systemId IN (:systemIds) AND title LIKE :query GROUP BY title, systemId, coverFrontUrl ORDER BY title ASC, id DESC")
     fun searchBySystems(systemIds: List<String>, query: String): PagingSource<Int, Game>
 
     @Query("SELECT DISTINCT systemId FROM games ORDER BY systemId ASC")
     suspend fun selectSystems(): List<String>
 
-    @Query("SELECT count(*) count, systemId systemId FROM games GROUP BY systemId")
+    @Query("SELECT count(DISTINCT title) count, systemId systemId FROM games GROUP BY systemId")
     fun selectSystemsWithCount(): Flow<List<SystemCount>>
 
     @Insert

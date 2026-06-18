@@ -565,7 +565,7 @@ data class GameSystem(
                                 ),
                         ),
                     ),
-                    uniqueExtensions = listOf("gbc"),
+                    uniqueExtensions = listOf("gbc", "gb"),
                 ),
                 GameSystem(
                     SystemID.GBA,
@@ -1304,7 +1304,6 @@ data class GameSystem(
                     SystemID.NES,
                     SystemID.SNES,
                     SystemID.N64,
-                    SystemID.GB,
                     SystemID.GBC,
                     SystemID.GBA,
                     SystemID.NDS,
@@ -1323,7 +1322,10 @@ data class GameSystem(
             mutableMap.toMap()
         }
 
-        fun findById(id: String): GameSystem = byIdCache.getValue(id)
+        fun findById(id: String): GameSystem {
+            val searchId = if (id == SystemID.GB.dbname) SystemID.GBC.dbname else id
+            return byIdCache.getValue(searchId)
+        }
 
         fun all() = SYSTEMS
 

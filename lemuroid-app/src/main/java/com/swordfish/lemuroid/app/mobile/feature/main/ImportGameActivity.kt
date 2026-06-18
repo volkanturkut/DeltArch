@@ -11,6 +11,7 @@ import com.swordfish.lemuroid.lib.storage.DirectoriesManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -25,6 +26,10 @@ class ImportGameActivity : Activity() {
         } else {
             finish()
         }
+    }
+
+    companion object {
+        private val importMutex = kotlinx.coroutines.sync.Mutex()
     }
 
     private fun importRom(uri: Uri) {
@@ -44,15 +49,27 @@ class ImportGameActivity : Activity() {
                 
                 val directoriesManager = DirectoriesManager(applicationContext)
                 val romsDir = directoriesManager.getInternalRomsDirectory()
-                val destFile = File(romsDir, fileName)
                 
-                contentResolver.openInputStream(uri)?.use { input ->
-                    destFile.outputStream().use { output ->
-                        input.copyTo(output)
+                importMutex.withLock {
+                    var destFile = File(romsDir, fileName)
+                    if (destFile.exists()) {
+                        val nameWithoutExtension = fileName.substringBeforeLast('.', fileName)
+                        val extension = if (fileName.contains('.')) "." + fileName.substringAfterLast('.') else ""
+                        var i = 1
+                        while (destFile.exists()) {
+                            destFile = File(romsDir, "$nameWithoutExtension ($i)$extension")
+                            i++
+                        }
                     }
+                    
+                    contentResolver.openInputStream(uri)?.use { input ->
+                        destFile.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    
+                    LibraryIndexScheduler.scheduleLibrarySync(applicationContext)
                 }
-                
-                LibraryIndexScheduler.scheduleLibrarySync(applicationContext)
                 
                 withContext(Dispatchers.Main) {
                     val mainIntent = Intent(this@ImportGameActivity, MainActivity::class.java)
