@@ -300,6 +300,16 @@ class BaseGameScreenViewModel(
         }
     }
 
+    fun captureAutoSaveScreenshot() {
+        viewModelScope.launch {
+            try {
+                saves.takeScreenshotPreviewForAutoSave()
+            } catch (e: Exception) {
+                // Ignore
+            }
+        }
+    }
+
     fun requestBackgroundSave() {
         if (loadingState.value) return
         GameService.schedule {

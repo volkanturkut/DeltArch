@@ -73,6 +73,7 @@ class GameSearchDao(private val internalDao: Internal) {
                 SELECT games.*
                     FROM games
                     WHERE games.title LIKE ?
+                    GROUP BY title, systemId, coverFrontUrl
                 """,
                 arrayOf(likeQuery),
             ),

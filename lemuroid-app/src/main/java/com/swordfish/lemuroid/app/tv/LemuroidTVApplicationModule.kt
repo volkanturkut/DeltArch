@@ -25,6 +25,14 @@ abstract class LemuroidTVApplicationModule {
 
     @PerActivity
     @ContributesAndroidInjector
+    abstract fun tvGameActivity2(): com.swordfish.lemuroid.app.tv.game.TVGameActivity2
+
+    @PerActivity
+    @ContributesAndroidInjector
+    abstract fun tvGameActivity3(): com.swordfish.lemuroid.app.tv.game.TVGameActivity3
+
+    @PerActivity
+    @ContributesAndroidInjector
     abstract fun tvGameMenuActivity(): TVGameMenuActivity
 
     @PerActivity

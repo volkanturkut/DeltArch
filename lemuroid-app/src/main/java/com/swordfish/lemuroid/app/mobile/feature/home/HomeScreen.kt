@@ -237,7 +237,11 @@ fun HomeScreen(
         }
 
         // 2. Overlay Search Results if query is active
-        if (searchQuery.isNotBlank()) {
+        androidx.compose.animation.AnimatedVisibility(
+            visible = searchQuery.isNotBlank(),
+            enter = androidx.compose.animation.fadeIn(),
+            exit = androidx.compose.animation.fadeOut()
+        ) {
             val searchViewModel: com.swordfish.lemuroid.app.mobile.feature.search.SearchViewModel = viewModel(
                 factory = com.swordfish.lemuroid.app.mobile.feature.search.SearchViewModel.Factory(retrogradeDb)
             )
@@ -346,7 +350,7 @@ private fun CategoryDotsIndicator(
     Box(
         modifier = Modifier
             .padding(vertical = 6.dp)
-            .clip(RoundedCornerShape(28.dp))
+            .clip(RoundedCornerShape(24.dp))
             .background(Color.Black.copy(alpha = 0.45f))
             .onSizeChanged { rowWidth = it.width }
             .pointerInput(categories.size) {
@@ -368,11 +372,11 @@ private fun CategoryDotsIndicator(
                     }
                 )
             }
-            .padding(horizontal = 10.dp, vertical = 5.dp),
+            .padding(horizontal = 11.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
-            horizontalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
             categories.forEachIndexed { index, category ->
@@ -381,7 +385,7 @@ private fun CategoryDotsIndicator(
 
                 Box(
                     modifier = Modifier
-                        .padding(horizontal = 4.dp)
+                        .size(25.dp)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
@@ -396,7 +400,7 @@ private fun CategoryDotsIndicator(
                                 Icon(
                                     imageVector = Icons.Filled.Star,
                                     contentDescription = "Favorites",
-                                    modifier = Modifier.size(if (isActive) 18.dp else 12.dp),
+                                    modifier = Modifier.size(if (isActive) 18.dp else 13.dp),
                                     tint = dotColor
                                 )
                             }
@@ -404,7 +408,7 @@ private fun CategoryDotsIndicator(
                                 Icon(
                                     imageVector = Icons.Filled.Schedule,
                                     contentDescription = "Recently Played",
-                                    modifier = Modifier.size(if (isActive) 18.dp else 12.dp),
+                                    modifier = Modifier.size(if (isActive) 18.dp else 13.dp),
                                     tint = dotColor
                                 )
                             }
@@ -413,14 +417,13 @@ private fun CategoryDotsIndicator(
                                 Image(
                                     painter = painterResource(id = imageRes),
                                     contentDescription = category.metaSystemInfo.metaSystem.name,
-                                    modifier = Modifier.size(20.dp),
+                                    modifier = Modifier.size(27.dp),
                                 )
                             }
                         }
                     } else {
                         Box(
                             modifier = Modifier
-                                .padding(3.dp)
                                 .size(6.dp)
                                 .background(dotColor, CircleShape)
                         )

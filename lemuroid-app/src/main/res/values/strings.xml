@@ -1,4 +1,4 @@
-﻿<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
     <string name="title_home">Home</string>
     <string name="title_search">Search</string>
     <string name="title_systems">Systems</string>
@@ -91,11 +91,18 @@
     <string name="settings_save_sync_include_states">Sync states</string>
     <string name="settings_save_sync_include_states_description">More convenient, but heavier and less reliable. Choose which cores/systems you want to sync</string>
 
-    <string name="game_context_menu_add_to_favorites">Add to favorites</string>
-    <string name="game_context_menu_remove_from_favorites">Remove from favorites</string>
+    <string name="game_context_menu_add_to_favorites">Favorite</string>
+    <string name="game_context_menu_remove_from_favorites">Unfavorite</string>
     <string name="game_context_menu_resume">Resume</string>
     <string name="game_context_menu_restart">Restart</string>
     <string name="game_context_menu_create_shortcut">Pin to launcher</string>
+    <string name="game_context_menu_rename">Rename</string>
+    <string name="game_context_menu_change_artwork">Change Artwork</string>
+    <string name="game_context_menu_share">Share</string>
+    <string name="game_context_menu_game_settings">Game Settings</string>
+    <string name="game_context_menu_view_save_states">View Save States</string>
+    <string name="game_context_menu_manage_save_file">Manage Save File</string>
+    <string name="game_context_menu_delete">Delete</string>
 
     <string name="home_notification_title">Enable notifications</string>
     <string name="home_notification_message">DeltArch uses notifications to let you know when a game or operation is running in background.</string>

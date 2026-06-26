@@ -128,7 +128,10 @@ class MainTVActivity : BaseTVActivity(), BusyActivity, com.swordfish.lemuroid.ap
                 retrogradeDb: RetrogradeDatabase,
                 shortcutsGenerator: ShortcutsGenerator,
                 gameLauncher: GameLauncher,
-            ) = GameInteractor(activity, retrogradeDb, true, shortcutsGenerator, gameLauncher)
+                statesManager: com.swordfish.lemuroid.lib.saves.StatesManager,
+                statesPreviewManager: com.swordfish.lemuroid.lib.saves.StatesPreviewManager,
+                coresSelection: com.swordfish.lemuroid.lib.core.CoresSelection,
+            ) = GameInteractor(activity, retrogradeDb, true, shortcutsGenerator, gameLauncher, statesManager, statesPreviewManager, coresSelection)
         }
     }
 }

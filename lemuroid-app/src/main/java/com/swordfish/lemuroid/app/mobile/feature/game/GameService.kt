@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.system.exitProcess
 
-class GameService : DaggerService() {
+open class GameService : DaggerService() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onBind(intent: Intent?) = null
@@ -40,7 +40,10 @@ class GameService : DaggerService() {
         flags: Int,
         startId: Int,
     ): Int {
-        displayNotification(intent)
+        val newWindow = intent.getBooleanExtra("EXTRA_NEW_WINDOW", false)
+        if (!newWindow) {
+            displayNotification(intent)
+        }
         return START_NOT_STICKY
     }
 

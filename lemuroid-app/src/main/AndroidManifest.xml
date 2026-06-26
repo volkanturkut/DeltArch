@@ -158,7 +158,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="content" />
-                <data android:mimeType="*/*" />
+                <data android:mimeType="application/zip" />
+                <data android:mimeType="application/octet-stream" />
                 <!-- Extra common ROM mimetypes -->
                 <data android:mimeType="application/x-nes-rom" />
                 <data android:mimeType="application/x-snes-rom" />
@@ -175,11 +176,29 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
             android:process=":game"
             android:theme="@style/LemuroidMaterialTheme.Game" />
+        <activity
+            android:name="com.swordfish.lemuroid.app.mobile.feature.game.GameActivity2"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+            android:process=":game2"
+            android:theme="@style/LemuroidMaterialTheme.Game" />
+        <activity
+            android:name="com.swordfish.lemuroid.app.mobile.feature.game.GameActivity3"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+            android:process=":game3"
+            android:theme="@style/LemuroidMaterialTheme.Game" />
 
         <service
             android:name=".app.mobile.feature.game.GameService"
             android:foregroundServiceType="dataSync"
             android:process=":game" />
+        <service
+            android:name="com.swordfish.lemuroid.app.mobile.feature.game.GameService2"
+            android:foregroundServiceType="dataSync"
+            android:process=":game2" />
+        <service
+            android:name="com.swordfish.lemuroid.app.mobile.feature.game.GameService3"
+            android:foregroundServiceType="dataSync"
+            android:process=":game3" />
 
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
@@ -240,6 +259,16 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
             android:process=":game"
             android:theme="@style/LemuroidMaterialTheme.Game" />
+        <activity
+            android:name=".app.tv.game.TVGameActivity2"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+            android:process=":game2"
+            android:theme="@style/LemuroidMaterialTheme.Game" />
+        <activity
+            android:name=".app.tv.game.TVGameActivity3"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|fontScale|fontWeightAdjustment|keyboard|layoutDirection|locale|mcc|navigation|smallestScreenSize|touchscreen|uiMode"
+            android:process=":game3"
+            android:theme="@style/LemuroidMaterialTheme.Game" />
 
         <activity
             android:name=".app.tv.gamemenu.TVGameMenuActivity"
@@ -262,6 +291,16 @@
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             tools:node="remove" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

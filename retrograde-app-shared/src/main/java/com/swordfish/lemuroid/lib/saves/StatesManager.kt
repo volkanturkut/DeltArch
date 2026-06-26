@@ -5,6 +5,7 @@ import com.swordfish.lemuroid.common.kotlin.readBytesUncompressedAtomic
 import com.swordfish.lemuroid.common.kotlin.readTextAtomic
 import com.swordfish.lemuroid.common.kotlin.runCatchingWithRetry
 import com.swordfish.lemuroid.common.kotlin.writeBytesCompressedAtomic
+import com.swordfish.lemuroid.common.kotlin.writeBytesAtomic
 import com.swordfish.lemuroid.common.kotlin.writeTextAtomic
 import com.swordfish.lemuroid.lib.library.CoreID
 import com.swordfish.lemuroid.lib.library.db.entity.Game
@@ -60,6 +61,34 @@ class StatesManager(private val directoriesManager: DirectoriesManager) {
         setSaveState(getAutoSaveFileName(game), coreID.coreName, saveState)
     }
 
+    suspend fun deleteSlotSave(
+        game: Game,
+        coreID: CoreID,
+        index: Int
+    ) = withContext(Dispatchers.IO) {
+        assert(index in 0 until MAX_STATES)
+        val fileName = getSlotSaveFileName(game, index)
+        val saveFile = getStateFile(fileName, coreID.coreName)
+        val metadataFile = getMetadataStateFile(fileName, coreID.coreName)
+        if (saveFile.exists()) saveFile.delete()
+        if (metadataFile.exists()) metadataFile.delete()
+    }
+
+    suspend fun renameSlotSave(
+        game: Game,
+        coreID: CoreID,
+        index: Int,
+        newName: String
+    ) = withContext(Dispatchers.IO) {
+        assert(index in 0 until MAX_STATES)
+        val currentState = getSlotSave(game, coreID, index)
+        if (currentState != null) {
+            val updatedMetadata = currentState.metadata.copy(name = newName)
+            val updatedState = SaveState(currentState.state, updatedMetadata)
+            setSlotSave(game, updatedState, coreID, index)
+        }
+    }
+
     suspend fun getSavedSlotsInfo(
         game: Game,
         coreID: CoreID,
@@ -70,6 +99,26 @@ class StatesManager(private val directoriesManager: DirectoriesManager) {
                 .map { SaveInfo(it.exists(), it.lastModified()) }
                 .toList()
         }
+
+    suspend fun getSlotSaveName(
+        game: Game,
+        coreID: CoreID,
+        index: Int
+    ): String? = withContext(Dispatchers.IO) {
+        val fileName = getSlotSaveFileName(game, index)
+        val metadataFile = getMetadataStateFile(fileName, coreID.coreName)
+        if (metadataFile.exists()) {
+            val stateMetadata = runCatching {
+                Json.Default.decodeFromString(
+                    SaveState.Metadata.serializer(),
+                    metadataFile.readTextAtomic(),
+                )
+            }.getOrNull()
+            stateMetadata?.name
+        } else {
+            null
+        }
+    }
 
     private suspend fun getSaveState(
         fileName: String,
@@ -139,6 +188,38 @@ class StatesManager(private val directoriesManager: DirectoriesManager) {
         val statesDirectories = File(directoriesManager.getStatesDirectory(), coreName)
         statesDirectories.mkdirs()
         return File(statesDirectories, "$stateFileName.metadata")
+    }
+
+    suspend fun importSlotSave(
+        game: Game,
+        coreID: CoreID,
+        index: Int,
+        stateBytes: ByteArray
+    ) = withContext(Dispatchers.IO) {
+        assert(index in 0 until MAX_STATES)
+        val fileName = getSlotSaveFileName(game, index)
+        val saveFile = getStateFile(fileName, coreID.coreName)
+        saveFile.writeBytesAtomic(stateBytes)
+        
+        // Also write metadata
+        val metadata = SaveState.Metadata(name = "Imported Slot ${index + 1}")
+        val metadataFile = getMetadataStateFile(fileName, coreID.coreName)
+        metadataFile.writeTextAtomic(kotlinx.serialization.json.Json.encodeToString(SaveState.Metadata.serializer(), metadata))
+    }
+
+    suspend fun exportSlotSave(
+        game: Game,
+        coreID: CoreID,
+        index: Int
+    ): ByteArray? = withContext(Dispatchers.IO) {
+        assert(index in 0 until MAX_STATES)
+        val fileName = getSlotSaveFileName(game, index)
+        val saveFile = getStateFile(fileName, coreID.coreName)
+        if (saveFile.exists()) {
+            saveFile.readBytes()
+        } else {
+            null
+        }
     }
 
     private fun getAutoSaveFileName(game: Game) = "${game.fileName}.state"

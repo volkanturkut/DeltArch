@@ -5,7 +5,14 @@ import kotlin.time.Duration.Companion.milliseconds
 import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.IntentFilter
 import android.os.Bundle
+import android.graphics.Rect
+import android.os.Build
+import android.view.View
+import android.view.ViewTreeObserver
 import android.view.KeyEvent
 import android.view.MotionEvent
 import androidx.activity.OnBackPressedCallback
@@ -91,14 +98,44 @@ abstract class BaseGameActivity : ImmersiveActivity() {
 
     private val startGameTime = System.currentTimeMillis()
     private var finishTriggered = false
+    private var quitReceiver: BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setUpExceptionsHandler()
-        GameService.startService(applicationContext, intent)
+        val processIndex = getProcessIndex(applicationContext)
+        val serviceClass = when (processIndex) {
+            1 -> com.swordfish.lemuroid.app.mobile.feature.game.GameService::class.java
+            2 -> com.swordfish.lemuroid.app.mobile.feature.game.GameService2::class.java
+            3 -> com.swordfish.lemuroid.app.mobile.feature.game.GameService3::class.java
+            else -> com.swordfish.lemuroid.app.mobile.feature.game.GameService::class.java
+        }
+        val serviceIntent = Intent(applicationContext, serviceClass).apply {
+            putExtra("EXTRA_GAME_ACTIVITY_INTENT", intent)
+            putExtra("EXTRA_NEW_WINDOW", intent.getBooleanExtra("EXTRA_NEW_WINDOW", false))
+        }
+        applicationContext.startService(serviceIntent)
         game = intent.serializable<Game>(EXTRA_GAME)!!
         systemCoreConfig = intent.serializable<SystemCoreConfig>(EXTRA_SYSTEM_CORE_CONFIG)!!
         system = GameSystem.findById(game.systemId)
+
+        SystemProcessLock.acquire(applicationContext, game.systemId, game.title)
+
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val targetSystemId = intent?.getStringExtra("systemId")
+                if (targetSystemId == game.systemId) {
+                    finish()
+                }
+            }
+        }
+        quitReceiver = receiver
+        val filter = IntentFilter("com.swordfish.lemuroid.action.QUIT_GAME")
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, filter)
+        }
 
         val viewModel by viewModels<BaseGameScreenViewModel> {
             BaseGameScreenViewModel.Factory(
@@ -144,11 +181,12 @@ abstract class BaseGameActivity : ImmersiveActivity() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    baseGameScreenViewModel.requestFinish()
+                    // Do nothing to ignore Android system back gestures
                 }
             },
         )
 
+        setUpGestureExclusion()
         initialiseFlows()
     }
 
@@ -283,6 +321,9 @@ abstract class BaseGameActivity : ImmersiveActivity() {
         keyCode: Int,
         event: KeyEvent,
     ): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true // Consume back key down during gameplay
+        }
         val handled = baseGameScreenViewModel.sendKeyEvent(keyCode, event)
         if (handled) {
             return true
@@ -294,6 +335,9 @@ abstract class BaseGameActivity : ImmersiveActivity() {
         keyCode: Int,
         event: KeyEvent,
     ): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true // Consume back key up during gameplay
+        }
         val handled = baseGameScreenViewModel.sendKeyEvent(keyCode, event)
         if (handled) {
             return true
@@ -349,6 +393,13 @@ abstract class BaseGameActivity : ImmersiveActivity() {
         finishTriggered = true
     }
 
+    override fun onPause() {
+        if (!finishTriggered && !isFinishing && !isChangingConfigurations) {
+            baseGameScreenViewModel.captureAutoSaveScreenshot()
+        }
+        super.onPause()
+    }
+
     override fun onStop() {
         if (!finishTriggered && !isFinishing && !isChangingConfigurations) {
             baseGameScreenViewModel.requestBackgroundSave()
@@ -358,9 +409,53 @@ abstract class BaseGameActivity : ImmersiveActivity() {
 
     override fun onDestroy() {
         if (!isChangingConfigurations) {
-            GameService.requestTermination()
+            val processIndex = getProcessIndex(applicationContext)
+            val serviceClass = when (processIndex) {
+                1 -> com.swordfish.lemuroid.app.mobile.feature.game.GameService::class.java
+                2 -> com.swordfish.lemuroid.app.mobile.feature.game.GameService2::class.java
+                3 -> com.swordfish.lemuroid.app.mobile.feature.game.GameService3::class.java
+                else -> com.swordfish.lemuroid.app.mobile.feature.game.GameService::class.java
+            }
+            try {
+                // Call requestTermination equivalent or directly call tasks channel?
+                // Wait! Since GameService has companion method requestTermination,
+                // and it is loaded in the current process's JVM, GameService.requestTermination()
+                // will target the companion object in THIS process's JVM.
+                // So calling GameService.requestTermination() works perfectly regardless of the subclass!
+                GameService.requestTermination()
+            } catch (e: Exception) {
+                // Ignore
+            }
+            SystemProcessLock.release(game.systemId)
+        }
+        quitReceiver?.let {
+            try {
+                unregisterReceiver(it)
+            } catch (e: Exception) {
+                // Ignore
+            }
         }
         super.onDestroy()
+    }
+
+    private fun getProcessIndex(context: Context): Int {
+        val processName = retrieveProcessName(context) ?: return 1
+        return when {
+            processName.endsWith(":game2") -> 2
+            processName.endsWith(":game3") -> 3
+            else -> 1
+        }
+    }
+
+    private fun retrieveProcessName(context: Context): String? {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            return dagger.android.support.DaggerApplication.getProcessName()
+        }
+        val currentPID = android.os.Process.myPid()
+        val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+        return manager.runningAppProcesses
+            ?.firstOrNull { it.pid == currentPID }
+            ?.processName
     }
 
     override fun onActivityResult(
@@ -422,6 +517,57 @@ abstract class BaseGameActivity : ImmersiveActivity() {
         }
     }
 
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val decorView = window.decorView
+            val displayMetrics = resources.displayMetrics
+            val width = displayMetrics.widthPixels
+            val height = displayMetrics.heightPixels
+            if (width > 0 && height > 0) {
+                val density = displayMetrics.density
+                val exclusionHeight = (200 * density).toInt()
+                val touchY = ev.y.toInt()
+                val top = (touchY - exclusionHeight / 2).coerceIn(0, height - exclusionHeight)
+                val bottom = top + exclusionHeight
+                
+                val rectWidth = (60 * density).toInt() // Wider zone (60dp)
+                
+                val leftRect = Rect(-100, top, rectWidth, bottom)
+                val rightRect = Rect(width - rectWidth, top, width + 100, bottom)
+                
+                decorView.systemGestureExclusionRects = listOf(leftRect, rightRect)
+            }
+        }
+        return super.dispatchTouchEvent(ev)
+    }
+
+    private fun setUpGestureExclusion() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val decorView = window.decorView
+            decorView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    val displayMetrics = resources.displayMetrics
+                    val width = displayMetrics.widthPixels
+                    val height = displayMetrics.heightPixels
+                    if (width > 0 && height > 0) {
+                        val density = displayMetrics.density
+                        val maxExclusionHeight = (200 * density).toInt()
+                        val exclusionHeight = minOf(height, maxExclusionHeight)
+                        val top = (height - exclusionHeight) / 2
+                        val bottom = top + exclusionHeight
+                        
+                        val rectWidth = (60 * density).toInt() // Wider zone (60dp)
+                        
+                        val leftRect = Rect(-100, top, rectWidth, bottom)
+                        val rightRect = Rect(width - rectWidth, top, width + 100, bottom)
+                        
+                        decorView.systemGestureExclusionRects = listOf(leftRect, rightRect)
+                    }
+                }
+            })
+        }
+    }
+
     companion object {
         const val DIALOG_REQUEST = 100
 
@@ -446,23 +592,48 @@ abstract class BaseGameActivity : ImmersiveActivity() {
             game: Game,
             loadSave: Boolean,
             useLeanback: Boolean,
+            newWindow: Boolean = false,
         ) {
+            val index = getFreeProcessIndex(activity.applicationContext)
             val gameActivity =
                 if (useLeanback) {
-                    TVGameActivity::class.java
+                    when (index) {
+                        1 -> TVGameActivity::class.java
+                        2 -> com.swordfish.lemuroid.app.tv.game.TVGameActivity2::class.java
+                        3 -> com.swordfish.lemuroid.app.tv.game.TVGameActivity3::class.java
+                        else -> TVGameActivity::class.java
+                    }
                 } else {
-                    GameActivity::class.java
+                    when (index) {
+                        1 -> GameActivity::class.java
+                        2 -> com.swordfish.lemuroid.app.mobile.feature.game.GameActivity2::class.java
+                        3 -> com.swordfish.lemuroid.app.mobile.feature.game.GameActivity3::class.java
+                        else -> GameActivity::class.java
+                    }
                 }
-            activity.startActivityForResult(
-                Intent(activity, gameActivity).apply {
-                    putExtra(EXTRA_GAME, game)
-                    putExtra(EXTRA_LOAD_SAVE, loadSave)
-                    putExtra(EXTRA_LEANBACK, useLeanback)
-                    putExtra(EXTRA_SYSTEM_CORE_CONFIG, systemCoreConfig)
-                },
-                REQUEST_PLAY_GAME,
-            )
+            val intent = Intent(activity, gameActivity).apply {
+                if (newWindow) {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                }
+                putExtra(EXTRA_GAME, game)
+                putExtra(EXTRA_LOAD_SAVE, loadSave)
+                putExtra(EXTRA_LEANBACK, useLeanback)
+                putExtra(EXTRA_SYSTEM_CORE_CONFIG, systemCoreConfig)
+                putExtra("EXTRA_NEW_WINDOW", newWindow)
+            }
+            if (newWindow) {
+                activity.startActivity(intent)
+            } else {
+                activity.startActivityForResult(intent, REQUEST_PLAY_GAME)
+            }
             activity.overrideTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        }
+
+        private fun getFreeProcessIndex(context: Context): Int {
+            if (!GameProcessLock.isProcessLocked(context, 1)) return 1
+            if (!GameProcessLock.isProcessLocked(context, 2)) return 2
+            if (!GameProcessLock.isProcessLocked(context, 3)) return 3
+            return 1 // Fallback to 1
         }
     }
 }

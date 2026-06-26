@@ -105,8 +105,22 @@ abstract class LemuroidApplicationModule {
     @ContributesAndroidInjector
     abstract fun gameActivity(): GameActivity
 
+    @PerActivity
+    @ContributesAndroidInjector
+    abstract fun gameActivity2(): com.swordfish.lemuroid.app.mobile.feature.game.GameActivity2
+
+    @PerActivity
+    @ContributesAndroidInjector
+    abstract fun gameActivity3(): com.swordfish.lemuroid.app.mobile.feature.game.GameActivity3
+
     @ContributesAndroidInjector
     abstract fun gameService(): GameService
+
+    @ContributesAndroidInjector
+    abstract fun gameService2(): com.swordfish.lemuroid.app.mobile.feature.game.GameService2
+
+    @ContributesAndroidInjector
+    abstract fun gameService3(): com.swordfish.lemuroid.app.mobile.feature.game.GameService3
 
     @PerActivity
     @ContributesAndroidInjector(modules = [GameMenuActivity.Module::class])

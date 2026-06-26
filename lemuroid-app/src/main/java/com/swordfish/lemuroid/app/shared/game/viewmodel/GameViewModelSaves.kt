@@ -44,6 +44,12 @@ class GameViewModelSaves(
     )
 
     suspend fun saveSlot(index: Int) {
+        val sharedPref = appContext.getSharedPreferences("locked_save_states", Context.MODE_PRIVATE)
+        val isLocked = sharedPref.getBoolean("locked_${game.id}_slot_$index", false)
+        if (isLocked) {
+            sideEffects.showToast("This slot is locked and cannot be overwritten.")
+            return
+        }
         getCurrentSaveState()?.let {
             statesManager.setSlotSave(game, it, systemCoreConfig.coreID, index)
             runCatching {
@@ -53,6 +59,12 @@ class GameViewModelSaves(
     }
 
     suspend fun loadSlot(index: Int) {
+        val sharedPref = appContext.getSharedPreferences("locked_save_states", Context.MODE_PRIVATE)
+        val isIncompatible = sharedPref.getBoolean("incompatible_${game.id}_slot_$index", false)
+        if (isIncompatible) {
+            sideEffects.showToast(appContext.getString(R.string.error_message_incompatible_state))
+            return
+        }
         try {
             statesManager.getSlotSave(game, systemCoreConfig.coreID, index)?.let {
                 val loaded =
@@ -77,7 +89,15 @@ class GameViewModelSaves(
     suspend fun captureSaveSnapshot(useEmulationThread: Boolean): SaveSnapshot? {
         val retroGameView = retroGameView.retroGameView ?: return null
         val sramState = retroGameView.serializeSRAM(useEmulationThread)
-        val autoSaveState = if (isAutoSaveEnabled()) getCurrentSaveState(useEmulationThread) else null
+        val autoSaveState = if (isAutoSaveEnabled()) {
+            val state = getCurrentSaveState(useEmulationThread)
+            if (state != null) {
+                runCatching {
+                    takeScreenshotPreviewForAutoSave()
+                }
+            }
+            state
+        } else null
         return SaveSnapshot(sramState, autoSaveState)
     }
 
@@ -132,6 +152,15 @@ class GameViewModelSaves(
         val preview = retroGameView.retroGameView?.takeScreenshot(previewSize, 3)
         if (preview != null) {
             statesPreviewManager.setPreviewForSlot(game, preview, systemCoreConfig.coreID, index)
+        }
+    }
+
+    suspend fun takeScreenshotPreviewForAutoSave() {
+        val sizeInDp = StatesPreviewManager.PREVIEW_SIZE_DP
+        val previewSize = GraphicsUtils.convertDpToPixel(sizeInDp, appContext).roundToInt()
+        val preview = retroGameView.retroGameView?.takeScreenshot(previewSize, 3)
+        if (preview != null) {
+            statesPreviewManager.setPreviewForAutoSave(game, preview, systemCoreConfig.coreID)
         }
     }
 

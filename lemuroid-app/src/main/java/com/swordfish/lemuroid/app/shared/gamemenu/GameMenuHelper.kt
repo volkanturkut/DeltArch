@@ -241,7 +241,7 @@ object GameMenuHelper {
         index: Int,
     ): Bitmap? {
         if (!saveStateInfo.exists) return null
-        val imageSize = GraphicsUtils.convertDpToPixel(96f, context).roundToInt()
+        val imageSize = GraphicsUtils.convertDpToPixel(StatesPreviewManager.PREVIEW_SIZE_DP, context).roundToInt()
         return statesPreviewManager.getPreviewForSlot(game, coreID, index, imageSize)
     }
 
