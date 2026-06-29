@@ -4,9 +4,10 @@ DeltArch is an android application that allows you to emulate classic video game
 
 It uses [Lemuroid](https://github.com/Swordfish90/Lemuroid), [Libretro](https://github.com/libretro/RetroArch) and [Delta](https://github.com/rileytestut/Delta)
 
+### YouTube Video
 [![YOUTUBE VIDEO](https://img.youtube.com/vi/PqN_8vqezAM/0.jpg)](https://www.youtube.com/watch?v=PqN_8vqezAM)
 
-### Supported Systems:
+### Supported Systems
 - Nintendo (NES) ([fceumm](https://docs.libretro.com/library/fceumm/))
 - Super Nintendo (SNES) ([snes9x](https://docs.libretro.com/library/snes9x/))
 - Game Boy / Game Boy Color (GBC) ([gambatte](https://docs.libretro.com/library/gambatte/))
@@ -15,7 +16,7 @@ It uses [Lemuroid](https://github.com/Swordfish90/Lemuroid), [Libretro](https://
 - Nintendo 64 (N64) ([mupen64plus](https://docs.libretro.com/library/mupen64plus/))
 - Nintendo DS (NDS) [MelonDS](https://docs.libretro.com/library/melonds/))
 
-### To-Do Supported Systems:
+### To-Do Supported Systems
 - NEC PC Engine (PCE) ([beetle_pce_fast](https://docs.libretro.com/library/beetle_pce_fast/))
 - Neo Geo Pocket (NGP) ([mednafen_ngp](https://docs.libretro.com/library/beetle_neopop/))
 - Neo Geo Pocket Color (NGC) ([mednafen_ngp](https://docs.libretro.com/library/beetle_neopop/))
@@ -32,7 +33,7 @@ It uses [Lemuroid](https://github.com/Swordfish90/Lemuroid), [Libretro](https://
 - Atari 7800 (A78) ([prosystem](https://docs.libretro.com/library/prosystem/))
 - Atari Lynx (Lynx) ([handy](https://docs.libretro.com/library/handy/))
   
-### Features:
+### Features
 - Controller support
 - Custom Controller Skins
 - Save States
