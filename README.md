@@ -2,7 +2,7 @@
 DeltArch is an android application that allows you to emulate classic video game systems for Android based on Libretro. It uses [Lemuroid](https://github.com/Swordfish90/Lemuroid), [Libretro](https://github.com/libretro/RetroArch) and [Delta](https://github.com/rileytestut/Delta).
 
 [![YOUTUBE VIDEO](https://img.youtube.com/vi/PqN_8vqezAM/0.jpg)](https://www.youtube.com/watch?v=PqN_8vqezAM)
-YouTube Video
+### YouTube Video
 
 ### Supported Systems
 - Nintendo (NES) ([fceumm](https://docs.libretro.com/library/fceumm/))
