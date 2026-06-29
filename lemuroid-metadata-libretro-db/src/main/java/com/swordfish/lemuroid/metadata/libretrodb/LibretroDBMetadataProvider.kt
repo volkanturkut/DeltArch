@@ -172,6 +172,18 @@ class LibretroDBMetadataProvider(private val ovgdbManager: LibretroDBManager) :
             systemName = "Nintendo - Game Boy"
         }
 
+        if (systemDbName == SystemID.N64.dbname) {
+            systemName = "Nintendo - Nintendo 64"
+        }
+
+        if (systemDbName == SystemID.GBC.dbname) {
+            systemName = "Nintendo - Game Boy Color"
+        }
+
+        if (systemDbName == SystemID.GBA.dbname) {
+            systemName = "Nintendo - Game Boy Advance"
+        }
+
         // Specific mame version don't have any thumbnails in Libretro database
         if (system.id == SystemID.MAME2003PLUS) {
             systemName = "MAME"
@@ -185,6 +197,6 @@ class LibretroDBMetadataProvider(private val ovgdbManager: LibretroDBManager) :
 
         val thumbGameName = name.replace(THUMB_REPLACE, "_")
 
-        return "http://thumbnails.libretro.com/$systemName/$imageType/$thumbGameName.png"
+        return "https://thumbnails.libretro.com/$systemName/$imageType/$thumbGameName.png"
     }
 }

@@ -99,6 +99,12 @@ enum class MainRoute(
         parent = SETTINGS,
         showBottomNavigation = false,
     ),
+    SETTINGS_SKINS(
+        route = "settings/skins",
+        titleId = R.string.settings_title_skins,
+        parent = SETTINGS,
+        showBottomNavigation = false,
+    ),
     ;
 
     val root = root()

@@ -4,11 +4,11 @@ import android.view.KeyEvent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Modifier
+import com.swordfish.touchinput.radial.controls.LemuroidControlAnalog
 import com.swordfish.touchinput.radial.controls.LemuroidControlButton
 import com.swordfish.touchinput.radial.controls.LemuroidControlCross
 import com.swordfish.touchinput.radial.controls.LemuroidControlFaceButtons
 import com.swordfish.touchinput.radial.layouts.shared.ComposeTouchLayouts
-import com.swordfish.touchinput.radial.layouts.shared.SecondaryAnalogLeft
 import com.swordfish.touchinput.radial.layouts.shared.SecondaryButtonL
 import com.swordfish.touchinput.radial.layouts.shared.SecondaryButtonMenu
 import com.swordfish.touchinput.radial.layouts.shared.SecondaryButtonMenuPlaceholder
@@ -32,7 +32,14 @@ fun PadKitScope.N64Left(
         modifier = modifier,
         primaryDial = { LemuroidControlCross(id = Id.DiscreteDirection(ComposeTouchLayouts.MOTION_SOURCE_DPAD)) },
         secondaryDials = {
-            SecondaryAnalogLeft()
+            LemuroidControlAnalog(
+                modifier =
+                    Modifier
+                        .radialPosition(-80f)
+                        .radialScale(2.0f),
+                id = Id.ContinuousDirection(ComposeTouchLayouts.MOTION_SOURCE_LEFT_STICK),
+                analogPressId = Id.Key(KeyEvent.KEYCODE_BUTTON_THUMBL),
+            )
             SecondaryButtonL()
             LemuroidControlButton(
                 modifier = Modifier.radialPosition(60f),
@@ -70,6 +77,14 @@ fun PadKitScope.N64Right(
             )
         },
         secondaryDials = {
+            LemuroidControlAnalog(
+                modifier =
+                    Modifier
+                        .radialPosition(+80f - 180f)
+                        .radialScale(2.0f),
+                id = Id.ContinuousDirection(ComposeTouchLayouts.MOTION_SOURCE_RIGHT_STICK),
+                analogPressId = Id.Key(KeyEvent.KEYCODE_BUTTON_THUMBR),
+            )
             SecondaryButtonR()
             SecondaryButtonStart(position = 2)
             LemuroidControlCross(

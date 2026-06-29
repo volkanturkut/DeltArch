@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.Height
 import androidx.compose.material.icons.filled.OpenInFull
 import androidx.compose.material.icons.automirrored.filled.RotateLeft
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -33,7 +32,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,14 +61,36 @@ import com.swordfish.touchinput.radial.LemuroidPadTheme
 import com.swordfish.touchinput.radial.LocalLemuroidPadTheme
 import com.swordfish.touchinput.radial.sensors.TiltConfiguration
 import com.swordfish.touchinput.radial.settings.TouchControllerSettingsManager
+import com.swordfish.touchinput.radial.settings.TouchControllerID
+import android.view.KeyEvent
+import com.swordfish.lemuroid.app.shared.skins.SkinManager
+import com.swordfish.lemuroid.app.shared.skins.DeltaSkinView
+import com.swordfish.lemuroid.app.shared.skins.SkinAssetLoader
+import com.swordfish.lemuroid.app.shared.skins.SkinPackage
+import com.swordfish.lemuroid.app.shared.skins.models.LayoutInfo
+import com.swordfish.lemuroid.lib.library.SystemID
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.os.Build
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
+import gg.padkit.inputevents.InputEvent
+import com.swordfish.libretrodroid.GLRetroView
 import com.swordfish.touchinput.radial.ui.GlassSurface
 import com.swordfish.touchinput.radial.ui.LemuroidButtonPressFeedback
 import gg.padkit.PadKit
 import gg.padkit.config.HapticFeedbackType
 import gg.padkit.inputstate.InputState
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun MobileGameScreen(viewModel: BaseGameScreenViewModel) {
+    val skinBitmapLoaded = remember { mutableStateOf(false) }
+    val initialSkinLoaded = remember { mutableStateOf(false) }
+
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val isLandscape = constraints.maxWidth > constraints.maxHeight
 
@@ -90,6 +113,54 @@ fun MobileGameScreen(viewModel: BaseGameScreenViewModel) {
 
         val touchControllerSettings = touchControllerSettingsState.value
         val currentControllerConfig = controllerConfigState.value
+
+        val context = LocalContext.current
+        val skinManager = remember { SkinManager(context) }
+        val systemId = remember(viewModel.system) {
+            when (viewModel.system.id) {
+                SystemID.NES -> "nes"
+                SystemID.SNES -> "snes"
+                SystemID.GB, SystemID.GBC -> "gbc"
+                SystemID.GBA -> "gba"
+                SystemID.N64 -> "n64"
+                SystemID.NDS -> "nds"
+                SystemID.GENESIS -> "genesis"
+                else -> null
+            }
+        }
+        val currentDensity = LocalDensity.current
+        val activeSkin by produceState<SkinPackage?>(null, systemId) {
+            value = withContext(Dispatchers.IO) {
+                systemId?.let { id ->
+                    val skin = skinManager.getSelectedSkin(id)
+                    if (skin != null) {
+                        // Prioritize current orientation
+                        val currentLayout = skinManager.getLayoutForSkin(skin, isLandscape = isLandscape, isTablet = false)
+                        currentLayout?.let { layout ->
+                            SkinAssetLoader.resolveAssetFile(skin, layout)?.let { file ->
+                                SkinAssetLoader.loadBitmap(file, currentDensity.density)
+                            }
+                        }
+                        
+                        // Load the other orientation in background
+                        this@produceState.launch {
+                            val otherLayout = skinManager.getLayoutForSkin(skin, isLandscape = !isLandscape, isTablet = false)
+                            otherLayout?.let { layout ->
+                                SkinAssetLoader.resolveAssetFile(skin, layout)?.let { file ->
+                                    SkinAssetLoader.loadBitmap(file, currentDensity.density)
+                                }
+                            }
+                        }
+                    }
+                    skin
+                }
+            }
+        }
+        val skinLayout = remember(activeSkin, isLandscape) {
+            activeSkin?.let { skin ->
+                skinManager.getLayoutForSkin(skin, isLandscape = isLandscape, isTablet = false)
+            }
+        }
 
         val tiltConfiguration = viewModel.getTiltConfiguration().collectAsState(TiltConfiguration.Disabled)
         val tiltSimulatedStates = viewModel.getSimulatedTiltEvents().collectAsState(InputState())
@@ -123,6 +194,7 @@ fun MobileGameScreen(viewModel: BaseGameScreenViewModel) {
 
             val fullScreenPosition = remember { mutableStateOf<Rect?>(null) }
             val viewportPosition = remember { mutableStateOf<Rect?>(null) }
+            val customViewportPosition = remember { mutableStateOf<Rect?>(null) }
 
             AndroidView(
                 modifier =
@@ -130,12 +202,21 @@ fun MobileGameScreen(viewModel: BaseGameScreenViewModel) {
                         .fillMaxSize()
                         .onGloballyPositioned { fullScreenPosition.value = it.boundsInRoot() },
                 factory = {
-                    viewModel.createRetroView(localContext, lifecycle)
+                    viewModel.createRetroView(localContext, lifecycle).apply {
+                        alpha = 0f // Start invisible, sync with skin
+                    }
                 },
+                update = { view ->
+                    // Show game view as soon as ANY skin is loaded (even if it's the cached one from last orientation)
+                    if (skinBitmapLoaded.value || initialSkinLoaded.value) {
+                        view.alpha = 1f
+                        initialSkinLoaded.value = true
+                    }
+                }
             )
 
             val fullPos = fullScreenPosition.value
-            val viewPos = viewportPosition.value
+            val viewPos = customViewportPosition.value ?: viewportPosition.value
 
             LaunchedEffect(fullPos, viewPos) {
                 val gameView = viewModel.retroGameView.retroGameViewFlow()
@@ -148,6 +229,62 @@ fun MobileGameScreen(viewModel: BaseGameScreenViewModel) {
                         (viewPos.bottom - fullPos.top) / fullPos.height,
                     )
                 gameView.viewport = viewport
+            }
+
+            val isVisible =
+                touchControllerSettings != null &&
+                    currentControllerConfig != null &&
+                    touchControlsVisibleState.value &&
+                    systemId != null
+
+            val selectedSkin = activeSkin
+            if (selectedSkin != null && skinLayout != null && isVisible) {
+                DeltaSkinView(
+                    modifier = Modifier.fillMaxSize(),
+                    skinPackage = selectedSkin,
+                    layout = skinLayout,
+                    onBitmapLoaded = { skinBitmapLoaded.value = it },
+                    onButtonStateChanged = { keyCode, pressed ->
+                        if (keyCode == KeyEvent.KEYCODE_BUTTON_MODE) {
+                            viewModel.handleVirtualInputEvent(listOf(InputEvent.Button(KeyEvent.KEYCODE_BUTTON_MODE, pressed)))
+                        } else {
+                            viewModel.retroGameView.retroGameView?.sendKeyEvent(
+                                if (pressed) KeyEvent.ACTION_DOWN else KeyEvent.ACTION_UP,
+                                keyCode
+                            )
+                        }
+                    },
+                    onDpadStateChanged = { xAxis, yAxis ->
+                        viewModel.retroGameView.retroGameView?.sendMotionEvent(
+                            GLRetroView.MOTION_SOURCE_DPAD,
+                            xAxis,
+                            yAxis
+                        )
+                    },
+                    onLeftAnalogStateChanged = { xAxis, yAxis ->
+                        viewModel.retroGameView.retroGameView?.sendMotionEvent(
+                            GLRetroView.MOTION_SOURCE_ANALOG_LEFT,
+                            xAxis,
+                            yAxis
+                        )
+                    },
+                    onRightAnalogStateChanged = { xAxis, yAxis ->
+                        viewModel.retroGameView.retroGameView?.sendMotionEvent(
+                            GLRetroView.MOTION_SOURCE_ANALOG_RIGHT,
+                            xAxis,
+                            yAxis
+                        )
+                    },
+                    onPointerEvent = { x, y, pressed ->
+                        viewModel.retroGameView.sendPointerEvent(x, y, pressed)
+                    },
+                    onScreenGapChanged = { gap ->
+                        viewModel.onScreenGapChanged(gap)
+                    },
+                    onViewportPositioned = { rect ->
+                        customViewportPosition.value = rect
+                    }
+                )
             }
 
             ConstraintLayout(
@@ -166,61 +303,44 @@ fun MobileGameScreen(viewModel: BaseGameScreenViewModel) {
                             .onGloballyPositioned { viewportPosition.value = it.boundsInRoot() },
                 )
 
-                val isVisible =
-                    touchControllerSettings != null &&
-                        currentControllerConfig != null &&
-                        touchControlsVisibleState.value
-
                 if (isVisible) {
                     CompositionLocalProvider(LocalLemuroidPadTheme provides LemuroidPadTheme()) {
-                        if (!isLandscape) {
-                            PadContainer(
-                                modifier = Modifier.layoutId(GameScreenLayout.CONSTRAINTS_BOTTOM_CONTAINER),
+                        if (activeSkin != null && skinLayout != null) {
+                            // Only show skin, no central menu button
+                        } else if (systemId == null) {
+                            // Only show default pads if we are NOT planning to load a skin
+                            if (!isLandscape) {
+                                PadContainer(
+                                    modifier = Modifier.layoutId(GameScreenLayout.CONSTRAINTS_BOTTOM_CONTAINER),
+                                )
+                            } else if (!currentControllerConfig!!.allowTouchOverlay) {
+                                PadContainer(
+                                    modifier = Modifier.layoutId(GameScreenLayout.CONSTRAINTS_LEFT_CONTAINER),
+                                )
+                                PadContainer(
+                                    modifier = Modifier.layoutId(GameScreenLayout.CONSTRAINTS_RIGHT_CONTAINER),
+                                )
+                            }
+
+                            leftGamePad?.invoke(
+                                this,
+                                Modifier.layoutId(GameScreenLayout.CONSTRAINTS_LEFT_PAD),
+                                touchControllerSettings!!,
                             )
-                        } else if (!currentControllerConfig.allowTouchOverlay) {
-                            PadContainer(
-                                modifier = Modifier.layoutId(GameScreenLayout.CONSTRAINTS_LEFT_CONTAINER),
+                            rightGamePad?.invoke(
+                                this,
+                                Modifier.layoutId(GameScreenLayout.CONSTRAINTS_RIGHT_PAD),
+                                touchControllerSettings!!,
                             )
-                            PadContainer(
-                                modifier = Modifier.layoutId(GameScreenLayout.CONSTRAINTS_RIGHT_CONTAINER),
-                            )
+
+                            GameScreenRunningCentralMenu()
                         }
-
-                        leftGamePad?.invoke(
-                            this,
-                            Modifier.layoutId(GameScreenLayout.CONSTRAINTS_LEFT_PAD),
-                            touchControllerSettings,
-                        )
-                        rightGamePad?.invoke(
-                            this,
-                            Modifier.layoutId(GameScreenLayout.CONSTRAINTS_RIGHT_PAD),
-                            touchControllerSettings,
-                        )
-
-                        GameScreenRunningCentralMenu(
-                            modifier = Modifier.layoutId(GameScreenLayout.CONSTRAINTS_GAME_CONTAINER),
-                            controllerConfig = currentControllerConfig,
-                            touchControllerSettings = touchControllerSettings,
-                            viewModel = viewModel,
-                        )
                     }
                 }
             }
         }
 
-        val isLoading =
-            viewModel.loadingState
-                .collectAsState(true)
-                .value
-
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
-        }
+        // Remove the isLoading overlay box to show the skin immediately
     }
 }
 
@@ -237,24 +357,8 @@ private fun PadContainer(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun GameScreenRunningCentralMenu(
-    modifier: Modifier = Modifier,
-    viewModel: BaseGameScreenViewModel,
-    touchControllerSettings: TouchControllerSettingsManager.Settings,
-    controllerConfig: ControllerConfig,
-) {
-    val menuPressed = viewModel.isMenuPressed().collectAsState(false)
-    Box(
-        modifier = modifier.wrapContentSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        LemuroidButtonPressFeedback(
-            pressed = menuPressed.value,
-            animationDurationMillis = MENU_LOADING_ANIMATION_MILLIS,
-            icon = R.drawable.button_menu,
-        )
-        MenuEditTouchControls(viewModel, controllerConfig, touchControllerSettings)
-    }
+private fun GameScreenRunningCentralMenu() {
+    // Menu is triggered immediately and icon is removed as requested
 }
 
 @Composable

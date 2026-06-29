@@ -2,8 +2,6 @@
 
 package com.swordfish.lemuroid.app.shared.game.viewmodel
 
-import kotlin.time.Duration.Companion.milliseconds
-
 import android.view.KeyEvent
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.ui.unit.Density
@@ -53,8 +51,6 @@ class GameViewModelTouchControls(
     private val menuPressed = MutableStateFlow(false)
     private val showEditControls = MutableStateFlow(false)
     private val hapticFeedbackMode = MutableStateFlow(HapticFeedbackMode.NONE)
-
-    private var loadingMenuJob: Job? = null
 
     override fun onCreate(owner: LifecycleOwner) {
         owner.launchOnState(Lifecycle.State.CREATED) {
@@ -148,15 +144,7 @@ class GameViewModelTouchControls(
         menuPressed.value = pressed
 
         if (pressed) {
-            loadingMenuJob?.cancel()
-            loadingMenuJob =
-                scope.launch {
-                    delay(MENU_LOADING_ANIMATION_MILLIS.milliseconds)
-                    sideEffects.showMenu(tilt, inputs)
-                }
-        } else {
-            loadingMenuJob?.cancel()
-            loadingMenuJob = null
+            sideEffects.showMenu(tilt, inputs)
         }
     }
 

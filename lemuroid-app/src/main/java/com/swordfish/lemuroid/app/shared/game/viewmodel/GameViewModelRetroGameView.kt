@@ -23,12 +23,16 @@ import com.swordfish.lemuroid.lib.game.GameLoader
 import com.swordfish.lemuroid.lib.game.GameLoaderError
 import com.swordfish.lemuroid.lib.game.GameLoaderException
 import com.swordfish.lemuroid.lib.library.GameSystem
+import com.swordfish.lemuroid.lib.library.SystemID
+import com.swordfish.lemuroid.lib.library.CoreID
+import com.swordfish.touchinput.radial.settings.TouchControllerSettingsManager
 import com.swordfish.lemuroid.lib.library.SystemCoreConfig
 import com.swordfish.lemuroid.lib.library.db.entity.Game
 import com.swordfish.lemuroid.lib.storage.RomFiles
 import com.swordfish.libretrodroid.GLRetroView
 import com.swordfish.libretrodroid.GLRetroViewData
 import com.swordfish.libretrodroid.ImmersiveMode
+import com.swordfish.libretrodroid.LibretroDroid
 import com.swordfish.libretrodroid.Variable
 import com.swordfish.libretrodroid.VirtualFile
 import kotlinx.coroutines.CoroutineScope
@@ -77,7 +81,32 @@ class GameViewModelRetroGameView(
     var retroGameView: GLRetroView? by MutableStateProperty(retroGameViewFlow)
 
     fun getGameState(): Flow<GameState> {
-        return gameState.debounce(200)
+        return gameState
+    }
+
+    fun updateOrientation(orientation: TouchControllerSettingsManager.Orientation) {
+        val variables = mutableListOf<CoreVariable>()
+        if (system.id == SystemID.NDS) {
+            val layoutValue =
+                if (orientation == TouchControllerSettingsManager.Orientation.LANDSCAPE) {
+                    if (systemCoreConfig.coreID == CoreID.DESMUME) "left/right" else "left-right"
+                } else {
+                    if (systemCoreConfig.coreID == CoreID.DESMUME) "top/bottom" else "top-bottom"
+                }
+
+            val key =
+                if (systemCoreConfig.coreID == CoreID.DESMUME) "desmume_screens_layout" else "melonds_screen_layout1"
+            variables.add(CoreVariable(key, layoutValue))
+        }
+        if (variables.isNotEmpty()) {
+            updateCoreVariables(variables)
+        }
+    }
+
+    fun updateScreenGap(gap: Int) {
+        if (system.id == SystemID.NDS && systemCoreConfig.coreID == CoreID.MELONDS) {
+            updateCoreVariables(listOf(CoreVariable("melonds_screen_gap", gap.toString())))
+        }
     }
 
     suspend fun initialize(
@@ -90,14 +119,7 @@ class GameViewModelRetroGameView(
         val currentState = gameState.value
         if (currentState != GameState.Uninitialized) return
 
-        val autoSaveEnabled = settingsManager.autoSave()
-        val filter = settingsManager.screenFilter()
-        val hdMode = settingsManager.hdMode()
-        val hdModeQuality = settingsManager.hdModeQuality()
-        val lowLatencyAudio = settingsManager.lowLatencyAudio()
-        val enableRumble = settingsManager.enableRumble()
-        val directLoad = settingsManager.allowDirectGameLoad()
-        val enableImmersiveMode = settingsManager.enableImmersiveMode()
+        val launchSettings = settingsManager.getLaunchSettings()
 
         val hasMicrophonePermission =
             ContextCompat.checkSelfPermission(
@@ -111,9 +133,9 @@ class GameViewModelRetroGameView(
             gameLoader.load(
                 applicationContext,
                 game,
-                requestLoadSave && autoSaveEnabled,
+                requestLoadSave && launchSettings.autoSave,
                 systemCoreConfig,
-                directLoad,
+                launchSettings.allowDirectGameLoad,
             )
 
         loadingStatesFlow
@@ -127,7 +149,6 @@ class GameViewModelRetroGameView(
                     }
                 sideEffects.requestFailureFinish(message)
             }
-            .debounce(200)
             .collect { loadingState ->
                 gameState.value =
                     if (loadingState is GameLoader.LoadingState.Ready) {
@@ -137,13 +158,13 @@ class GameViewModelRetroGameView(
                                 applicationContext,
                                 systemCoreConfig,
                                 loadingState.gameData,
-                                hdMode,
-                                hdModeQuality,
-                                filter,
-                                lowLatencyAudio,
-                                enableRumble,
+                                launchSettings.hdMode,
+                                launchSettings.hdModeQuality,
+                                launchSettings.screenFilter,
+                                launchSettings.lowLatencyAudio,
+                                launchSettings.enableRumble,
                                 enableMicrophone,
-                                enableImmersiveMode,
+                                launchSettings.enableImmersiveMode,
                             )
                         GameState.Loaded(
                             gameData = loadingState.gameData,
@@ -316,6 +337,18 @@ class GameViewModelRetroGameView(
         retroGameViewFlow().getGLRetroErrors()
             .catch { Timber.e(it, "Exception in GLRetroErrors. Ironic.") }
             .collect { handleRetroViewError(it) }
+    }
+
+    fun sendPointerEvent(x: Float, y: Float, pressed: Boolean) {
+        val retroView = retroGameView ?: return
+        if (!pressed) {
+            LibretroDroid.onTouchEvent(-10f, 10f)
+            return
+        }
+
+        val xNorm = (2f * x / retroView.width - 1f).coerceIn(-1f, 1f)
+        val yNorm = (2f * y / retroView.height - 1f).coerceIn(-1f, 1f)
+        LibretroDroid.onTouchEvent(xNorm, yNorm)
     }
 
     private fun updateCoreVariables(options: List<CoreVariable>) {

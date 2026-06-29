@@ -39,36 +39,7 @@ fun LemuroidButtonPressFeedback(
         modifier = Modifier.size(96.dp),
         contentAlignment = Alignment.Center,
     ) {
-        var shouldShow by remember { mutableStateOf(false) }
-        var progress by remember { mutableFloatStateOf(0f) }
-
-        val animatedProgress by animateFloatAsState(
-            targetValue = progress,
-            animationSpec =
-                tween(
-                    durationMillis = animationDurationMillis,
-                    easing = LinearEasing,
-                ),
-            label = "progress",
-            finishedListener = {
-                if (progress > 0.5) {
-                    shouldShow = false
-                }
-            },
-        )
-
-        LaunchedEffect(pressed) {
-            if (pressed) {
-                shouldShow = true
-                progress = 1f
-            } else {
-                progress = 0f
-                delay(animationDurationMillis.milliseconds)
-                shouldShow = false
-            }
-        }
-
-        AnimatedVisibility(shouldShow, enter = fadeIn(), exit = fadeOut()) {
+        AnimatedVisibility(pressed, enter = fadeIn(), exit = fadeOut()) {
             Box(
                 modifier =
                     Modifier
@@ -80,16 +51,6 @@ fun LemuroidButtonPressFeedback(
                 LemuroidButtonForeground(
                     pressed = remember { mutableStateOf(false) },
                     icon = icon,
-                )
-
-                CircularProgressIndicator(
-                    modifier =
-                        Modifier
-                            .fillMaxSize(0.625f)
-                            .align(Alignment.Center),
-                    progress = { animatedProgress },
-                    color = LocalLemuroidPadTheme.current.icons(false),
-                    trackColor = Color.Transparent,
                 )
             }
         }

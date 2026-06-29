@@ -107,4 +107,28 @@ class SettingsManager(private val context: Context, sharedPreferences: Lazy<Shar
                 .asFlow()
                 .first()
         }
+
+    data class LaunchSettings(
+        val autoSave: Boolean,
+        val screenFilter: String,
+        val hdMode: Boolean,
+        val hdModeQuality: HDModeQuality,
+        val lowLatencyAudio: Boolean,
+        val enableRumble: Boolean,
+        val allowDirectGameLoad: Boolean,
+        val enableImmersiveMode: Boolean,
+    )
+
+    suspend fun getLaunchSettings(): LaunchSettings {
+        return LaunchSettings(
+            autoSave = autoSave(),
+            screenFilter = screenFilter(),
+            hdMode = hdMode(),
+            hdModeQuality = hdModeQuality(),
+            lowLatencyAudio = lowLatencyAudio(),
+            enableRumble = enableRumble(),
+            allowDirectGameLoad = allowDirectGameLoad(),
+            enableImmersiveMode = enableImmersiveMode(),
+        )
+    }
 }

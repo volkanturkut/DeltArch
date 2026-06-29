@@ -37,6 +37,8 @@ import com.swordfish.lemuroid.lib.saves.SavesManager
 import com.swordfish.lemuroid.lib.saves.StatesManager
 import com.swordfish.lemuroid.lib.storage.DirectoriesManager
 import com.swordfish.lemuroid.lib.storage.RomFiles
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -69,84 +71,102 @@ class GameLoader(
         directLoad: Boolean,
     ): Flow<LoadingState> =
         flow {
-            try {
-                emit(LoadingState.LoadingCore)
+            coroutineScope {
+                try {
+                    emit(LoadingState.LoadingCore)
 
-                val system = GameSystem.findById(game.systemId)
+                    val system = GameSystem.findById(game.systemId)
 
-                if (!isArchitectureSupported(systemCoreConfig)) {
-                    throw GameLoaderException(GameLoaderError.UnsupportedArchitecture)
-                }
+                    if (!isArchitectureSupported(systemCoreConfig)) {
+                        throw GameLoaderException(GameLoaderError.UnsupportedArchitecture)
+                    }
 
-                val coreLibrary =
-                    runCatching {
-                        findLibrary(appContext, systemCoreConfig.coreID)!!.absolutePath
-                    }.getOrElse { throw GameLoaderException(GameLoaderError.LoadCore) }
-
-                emit(LoadingState.LoadingGame)
-
-                val missingBiosFiles = biosManager.getMissingBiosFiles(systemCoreConfig, game)
-                if (missingBiosFiles.isNotEmpty()) {
-                    throw GameLoaderException(GameLoaderError.MissingBiosFiles(missingBiosFiles))
-                }
-
-                val gameFiles =
-                    runCatching {
-                        val useVFS = systemCoreConfig.supportsLibretroVFS && directLoad
-                        val dataFiles = retrogradeDatabase.dataFileDao().selectDataFilesForGame(game.id)
-                        lemuroidLibrary.getGameFiles(game, dataFiles, useVFS)
-                    }.getOrElse { throw it }
-
-                val saveRAM =
-                    runCatching {
-                        val data = savesManager.getSaveRAM(game, systemCoreConfig)
-                        desmumeMigrationHandler.resolveSaveData(game, systemCoreConfig.coreID, data)
-                    }.getOrElse { throw GameLoaderException(GameLoaderError.Saves) }
-                val saveRAMData = saveRAM.data
-
-                val quickSaveData =
-                    runCatching {
-                        val shouldDiscardSave =
-                            !savesCoherencyEngine.shouldDiscardAutoSaveState(
-                                game,
-                                systemCoreConfig.coreID,
-                                saveRAM.timestampOverride,
-                            )
-
-                        if (systemCoreConfig.statesSupported && loadSave && shouldDiscardSave) {
-                            statesManager.getAutoSave(game, systemCoreConfig.coreID)
-                        } else {
-                            null
+                    val coreLibraryDeferred =
+                        async {
+                            runCatching {
+                                findLibrary(appContext, systemCoreConfig.coreID)!!.absolutePath
+                            }.getOrElse { throw GameLoaderException(GameLoaderError.LoadCore) }
                         }
-                    }.getOrElse { throw GameLoaderException(GameLoaderError.Saves) }
 
-                val coreVariables =
-                    coreVariablesManager.getOptionsForCore(system.id, systemCoreConfig)
-                        .toTypedArray()
+                    val missingBiosFilesDeferred = async { biosManager.getMissingBiosFiles(systemCoreConfig, game) }
 
-                val systemDirectory = directoriesManager.getSystemDirectory()
-                val savesDirectory = directoriesManager.getSavesDirectory()
+                    emit(LoadingState.LoadingGame)
 
-                emit(
-                    LoadingState.Ready(
-                        GameData(
-                            game,
-                            coreLibrary,
-                            gameFiles,
-                            quickSaveData,
-                            saveRAMData,
-                            coreVariables,
-                            systemDirectory,
-                            savesDirectory,
+                    val gameFilesDeferred =
+                        async {
+                            runCatching {
+                                val useVFS = systemCoreConfig.supportsLibretroVFS && directLoad
+                                val dataFiles = retrogradeDatabase.dataFileDao().selectDataFilesForGame(game.id)
+                                lemuroidLibrary.getGameFiles(game, dataFiles, useVFS)
+                            }.getOrElse { throw it }
+                        }
+
+                    val saveRAMDeferred =
+                        async {
+                            runCatching {
+                                val data = savesManager.getSaveRAM(game, systemCoreConfig)
+                                desmumeMigrationHandler.resolveSaveData(game, systemCoreConfig.coreID, data)
+                            }.getOrElse { throw GameLoaderException(GameLoaderError.Saves) }
+                        }
+
+                    val coreVariablesDeferred =
+                        async {
+                            coreVariablesManager.getOptionsForCore(system.id, systemCoreConfig)
+                                .toTypedArray()
+                        }
+
+                    val missingBiosFiles = missingBiosFilesDeferred.await()
+                    if (missingBiosFiles.isNotEmpty()) {
+                        throw GameLoaderException(GameLoaderError.MissingBiosFiles(missingBiosFiles))
+                    }
+
+                    val saveRAM = saveRAMDeferred.await()
+                    val saveRAMData = saveRAM.data
+
+                    val quickSaveData =
+                        runCatching {
+                            val shouldDiscardSave =
+                                !savesCoherencyEngine.shouldDiscardAutoSaveState(
+                                    game,
+                                    systemCoreConfig.coreID,
+                                    saveRAM.timestampOverride,
+                                )
+
+                            if (systemCoreConfig.statesSupported && loadSave && shouldDiscardSave) {
+                                statesManager.getAutoSave(game, systemCoreConfig.coreID)
+                            } else {
+                                null
+                            }
+                        }.getOrElse { throw GameLoaderException(GameLoaderError.Saves) }
+
+                    val coreLibrary = coreLibraryDeferred.await()
+                    val gameFiles = gameFilesDeferred.await()
+                    val coreVariables = coreVariablesDeferred.await()
+
+                    val systemDirectory = directoriesManager.getSystemDirectory()
+                    val savesDirectory = directoriesManager.getSavesDirectory()
+
+                    emit(
+                        LoadingState.Ready(
+                            GameData(
+                                game,
+                                coreLibrary,
+                                gameFiles,
+                                quickSaveData,
+                                saveRAMData,
+                                coreVariables,
+                                systemDirectory,
+                                savesDirectory,
+                            ),
                         ),
-                    ),
-                )
-            } catch (e: GameLoaderException) {
-                Timber.e(e, "Error while preparing game")
-                throw e
-            } catch (e: Exception) {
-                Timber.e(e, "Error while preparing game")
-                throw GameLoaderException(GameLoaderError.Generic)
+                    )
+                } catch (e: GameLoaderException) {
+                    Timber.e(e, "Error while preparing game")
+                    throw e
+                } catch (e: Exception) {
+                    Timber.e(e, "Error while preparing game")
+                    throw GameLoaderException(GameLoaderError.Generic)
+                }
             }
         }
 

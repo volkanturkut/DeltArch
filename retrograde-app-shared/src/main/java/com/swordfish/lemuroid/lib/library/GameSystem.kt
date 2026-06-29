@@ -120,6 +120,7 @@ data class GameSystem(
                                 hashMapOf(
                                     0 to arrayListOf(ControllerConfigs.NES),
                                 ),
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("nes"),
@@ -137,6 +138,7 @@ data class GameSystem(
                                     0 to arrayListOf(ControllerConfigs.SNES),
                                     1 to arrayListOf(ControllerConfigs.SNES),
                                 ),
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("smc", "sfc"),
@@ -211,6 +213,7 @@ data class GameSystem(
                                 hashMapOf(
                                     0 to arrayListOf(ControllerConfigs.SMS),
                                 ),
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("sms"),
@@ -304,6 +307,7 @@ data class GameSystem(
                                             ControllerConfigs.GENESIS_6,
                                         ),
                                 ),
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("gen", "smd", "md"),
@@ -441,6 +445,7 @@ data class GameSystem(
                                 hashMapOf(
                                     0 to arrayListOf(ControllerConfigs.GG),
                                 ),
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("gg"),
@@ -499,6 +504,7 @@ data class GameSystem(
                                 hashMapOf(
                                     0 to arrayListOf(ControllerConfigs.GB),
                                 ),
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("gb"),
@@ -563,6 +569,7 @@ data class GameSystem(
                                 hashMapOf(
                                     0 to arrayListOf(ControllerConfigs.GB),
                                 ),
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("gbc", "gb"),
@@ -634,6 +641,7 @@ data class GameSystem(
                                 hashMapOf(
                                     0 to arrayListOf(ControllerConfigs.GBA),
                                 ),
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("gba"),
@@ -728,6 +736,7 @@ data class GameSystem(
                                 ),
                             rumbleSupported = true,
                             skipDuplicateFrames = false,
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("n64", "z64"),
@@ -964,6 +973,7 @@ data class GameSystem(
                                     0 to arrayListOf(ControllerConfigs.DESMUME),
                                 ),
                             skipDuplicateFrames = false,
+                            supportsLibretroVFS = true,
                         ),
                         SystemCoreConfig(
                             CoreID.MELONDS,
@@ -1021,6 +1031,7 @@ data class GameSystem(
                                 ),
                             statesVersion = 2,
                             supportsMicrophone = true,
+                            supportsLibretroVFS = true,
                         ),
                     ),
                     uniqueExtensions = listOf("nds"),

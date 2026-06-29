@@ -99,6 +99,7 @@ class BaseGameScreenViewModel(
     }
 
     private val sideEffects = GameViewModelSideEffects(viewModelScope)
+    val system: GameSystem = system
     val retroGameView =
         GameViewModelRetroGameView(
             appContext,
@@ -224,6 +225,11 @@ class BaseGameScreenViewModel(
 
     fun onScreenOrientationChanged(orientation: TouchControllerSettingsManager.Orientation) {
         touchControls.updateScreenOrientation(orientation)
+        retroGameView.updateOrientation(orientation)
+    }
+
+    fun onScreenGapChanged(gap: Int) {
+        retroGameView.updateScreenGap(gap)
     }
 
     fun isTouchControllerVisible(): Flow<Boolean> {

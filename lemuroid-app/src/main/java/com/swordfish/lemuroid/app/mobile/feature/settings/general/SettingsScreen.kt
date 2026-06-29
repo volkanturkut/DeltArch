@@ -26,6 +26,9 @@ import com.swordfish.lemuroid.app.utils.android.settings.booleanPreferenceState
 import com.swordfish.lemuroid.app.utils.android.settings.indexPreferenceState
 import com.swordfish.lemuroid.app.utils.android.settings.intPreferenceState
 import com.swordfish.lemuroid.app.utils.android.stringListResource
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Palette
 
 @Composable
 fun SettingsScreen(
@@ -57,6 +60,7 @@ fun SettingsScreen(
         )
         GeneralSettings()
         InputSettings(navController = navController)
+        ControlsSettings(navController = navController)
         MiscSettings(
             indexingInProgress = indexingInProgress,
             isSaveSyncSupported = state.isSaveSyncSupported,
@@ -222,5 +226,26 @@ private fun RomsSettings(
                 enabled = !indexingInProgress,
             )
         }
+    }
+}
+
+@Composable
+private fun ControlsSettings(navController: NavController) {
+    LemuroidCardSettingsGroup(
+        title = { Text(text = stringResource(id = R.string.settings_category_controls)) },
+    ) {
+        LemuroidSettingsMenuLink(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Palette,
+                    contentDescription = null,
+                )
+            },
+            title = { Text(text = stringResource(id = R.string.settings_title_skins)) },
+            subtitle = {
+                Text(text = stringResource(id = R.string.settings_description_skins))
+            },
+            onClick = { navController.navigateToRoute(MainRoute.SETTINGS_SKINS) },
+        )
     }
 }
