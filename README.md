@@ -23,7 +23,7 @@ DeltArch is an android application that allows you to emulate classic video game
 - PlayStation (PSX) ([PCSX-ReARMed](https://docs.libretro.com/library/pcsx_rearmed/))
 - PlayStation Portable (PSP) ([ppsspp](https://docs.libretro.com/library/ppsspp/))
 - FinalBurn Neo (Arcade) ([fbneo](https://github.com/libretro/FBNeo/))
-- Sega CD (aka Mega CD) ([genesis_plus_gx](https://docs.libretro.com/library/genesis_plus_gx/))
+- Sega CD / Mega CD (CD) ([genesis_plus_gx](https://docs.libretro.com/library/genesis_plus_gx/))
 - Sega Master System (SMS) ([genesis_plus_gx](https://docs.libretro.com/library/genesis_plus_gx/))
 - Sega Game Gear (GG) ([genesis_plus_gx](https://docs.libretro.com/library/genesis_plus_gx/))
 - Atari 2600 (A26) ([stella](https://docs.libretro.com/library/stella/))
