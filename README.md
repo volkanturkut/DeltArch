@@ -18,7 +18,7 @@ DeltArch is an android application that allows you to emulate classic video game
 - Nintendo 64 (N64) ([mupen64plus](https://docs.libretro.com/library/mupen64plus/))
 - Nintendo DS (NDS) [MelonDS](https://docs.libretro.com/library/melonds/))
 
-### To-Do Supported Systems
+### To-Do Supported Systems (with .manicskin support)
 - NEC PC Engine (PCE) ([beetle_pce_fast](https://docs.libretro.com/library/beetle_pce_fast/))
 - Neo Geo Pocket (NGP) ([mednafen_ngp](https://docs.libretro.com/library/beetle_neopop/))
 - Neo Geo Pocket Color (NGC) ([mednafen_ngp](https://docs.libretro.com/library/beetle_neopop/))
